@@ -89,12 +89,12 @@ gcloud compute os-login ssh-keys add --key-file="$HOME/.ssh/google_compute_engin
 echo "Keys synchronized."
 
 # 3. Synchronize Physics Engine (Integrator)
-# We stage the engine logic in GCS so the remote cluster can pull it 
-# reliably regardless of container mount points.
-echo "Staging physics engine in GCS..."
+# We stage the engine logic in GCS using the project's folder structure 
+# to ensure a professional and organized remote environment.
+echo "Staging physics engine in GCS (structured)..."
 BUCKET_NAME="black-hole-visualizer-project-bh-vis-dataproc-config"
-gcloud storage cp "src/engine/integrator.py" "gs://${BUCKET_NAME}/notebooks/integrator.py" --quiet 2>/dev/null
-echo "Engine logic staged in GCS."
+gcloud storage cp "src/engine/integrator.py" "gs://${BUCKET_NAME}/deploy/src/engine/integrator.py" --quiet 2>/dev/null
+echo "Engine logic staged in GCS: deploy/src/engine/"
 
 # 4. Start SSH Tunnel
 echo "Establishing SSH tunnel on port $LOCAL_PORT..."
