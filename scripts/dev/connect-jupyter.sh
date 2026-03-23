@@ -49,12 +49,21 @@ echo "----------------------------------------------------"
 
 # 1. Discover the Master Node
 echo "Searching for Master Node..."
+# Trying with labels first (standard), then falling back to name-based search
 MASTER_NODE=$(gcloud compute instances list \
-    --filter="labels.goog-dataproc-cluster-name=$CLUSTER_NAME AND labels.goog-dataproc-cluster-role=MASTER" \
+    --filter="labels.goog-dataproc-cluster-name=$CLUSTER_NAME AND (labels.goog-dataproc-cluster-role=MASTER OR name ~ .*-m$)" \
     --format="value(name)" --limit=1)
 
 if [ -z "$MASTER_NODE" ]; then
+    # Final fallback: search by name pattern only
+    MASTER_NODE=$(gcloud compute instances list \
+        --filter="name ~ ^$CLUSTER_NAME-m" \
+        --format="value(name)" --limit=1)
+fi
+
+if [ -z "$MASTER_NODE" ]; then
     echo "Error: Master Node not found for cluster $CLUSTER_NAME"
+    echo "Please ensure the cluster is RUNNING in project $PROJECT_ID"
     exit 1
 fi
 echo "Found Master: $MASTER_NODE"
