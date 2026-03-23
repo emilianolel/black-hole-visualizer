@@ -36,7 +36,11 @@ graph TD
 ### **Fase 1: Infraestructura (Completado) ✅**
 - Despliegue de red VPC y Cloud NAT.
 - Módulos de Terraform para GCS, BigQuery y Dataproc.
-- Scripts de automatización: `init.sh`, `audit.sh`, `costs.sh`.
+- Scripts de automatización:
+    - `init.sh`: Bootstrap completo del proyecto (incluye habilitación automática de APIs).
+    - `sync-project.sh`: Sincronización masiva de identificadores (Project ID, Región, Buckets) en toda la configuración.
+    - `audit.sh`: Reporte rápido de recursos activos.
+    - `costs.sh`: Estimación de costos mensuales.
 - Configuración de VM de gestión con IP estática.
 
 ### **Fase 2: Motor de Simulación (En progreso) 🛠️**
@@ -60,8 +64,20 @@ graph TD
 
 ## 🚀 Guía de Inicio Rápido
 
-Para desplegar la infraestructura base, consulta la documentación en la carpeta de Terraform:
+### 1. Inicialización (Bootstrap)
+Prepara el proyecto de GCP, crea el bucket de estado y la cuenta de servicio administrativa:
+```bash
+bash terraform/scripts/init.sh [PROJECT_ID] [STATE_BUCKET] [REGION] [USER_EMAIL]
+```
 
+### 2. Sincronización de Identificadores
+Si necesitas cambiar de proyecto o región en el futuro, usa el script de sincronización:
+```bash
+bash terraform/scripts/sync-project.sh [PROJECT_ID] [STATE_BUCKET] [REGION] [USER_EMAIL]
+```
+
+### 3. Despliegue de Infraestructura
+Consulta las instrucciones detalladas en la carpeta de Terraform:
 👉 [**Instrucciones de Infraestructura (Terraform)**](./terraform/README.md)
 
 ---
@@ -69,6 +85,7 @@ Para desplegar la infraestructura base, consulta la documentación en la carpeta
 ## 🛠️ Tecnologías Utilizadas
 
 - **Infraestructura**: Terraform, GCP (Dataproc, BigQuery, GCS, GCE).
+- **Automatización**: Bash scripting (Init, Sync, Audit, Costs).
 - **Procesamiento**: Python, PySpark.
 - **Matemáticas**: RK4 Integration, Schwarzschild Metric.
 - **Frontend**: React, Vite, Nginx.
