@@ -28,7 +28,10 @@ gcloud services enable \
     serviceusage.googleapis.com \
     cloudresourcemanager.googleapis.com \
     iam.googleapis.com \
-    storage.googleapis.com --project="${PROJECT_ID}"
+    storage.googleapis.com \
+    compute.googleapis.com \
+    bigquery.googleapis.com \
+    dataproc.googleapis.com --project="${PROJECT_ID}"
 
 # 2. Crear Bucket para el Estado de Terraform
 echo "🪣  Verificando bucket de estado..."
