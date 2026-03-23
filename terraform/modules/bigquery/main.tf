@@ -42,6 +42,7 @@ resource "google_bigquery_table" "photon_paths" {
   dataset_id = google_bigquery_dataset.analytics.dataset_id
   table_id   = "photon_paths"
   project    = var.project_id
+  deletion_protection = false
 
   # Explicit schema is REQUIRED when using clustering in Terraform
   schema = <<EOF
