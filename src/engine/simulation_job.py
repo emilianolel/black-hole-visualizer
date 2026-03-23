@@ -33,33 +33,30 @@ def run_simulation(partition_id, iterator):
             
     return iter(results)
 
+def generate_initial_conditions(photon_id, num_photons=100000):
+    """
+    Worker-side function to generate initial conditions for a single photon.
+    This prevents memory pressure on the driver node.
+    """
+    phi = (2 * np.pi * photon_id) / num_photons
+    return {
+        "photon_id": int(photon_id),
+        "t0": 0.0, "r0": 20.0, "theta0": np.pi/2, "phi0": float(phi),
+        "pt0": -1.0, "pr0": -0.5, "ptheta0": 0.0, "pphi0": 4.4
+    }
+
 def main():
     spark = SparkSession.builder \
-        .appName("BlackHole-RayTracer-Phase2") \
-        .get_groupByName("physics-engine") \
+        .appName("BlackHole-RayTracer-Phase2-Pro") \
         .getOrCreate()
 
-    sc = spark.sparkContext
+    # 1. Distributed Generation of Initial Conditions
+    # We start with a range of IDs and generate ICs on the workers.
+    # Increasing to 100,000 photons to demonstrate "Pro" scalability.
+    num_photons = 100000 
+    df_ic = spark.range(num_photons).rdd.map(lambda x: generate_initial_conditions(x, num_photons)).toDF()
     
-    # 1. Generate Initial Conditions (Simple dummy grid for testing)
-    # In a real run, this would be a complex camera model
-    num_photons = 1000
-    r_start = 20.0
-    initial_conditions = []
-    
-    for i in range(num_photons):
-        phi = (2 * np.pi * i) / num_photons
-        ic = {
-            "photon_id": i,
-            "t0": 0.0, "r0": r_start, "theta0": np.pi/2, "phi0": phi,
-            "pt0": -1.0, "pr0": -0.5, "ptheta0": 0.0, "pphi0": 4.4 # Targeted at BH
-        }
-        initial_conditions.append(ic)
-
-    # 2. Distribute with Spark
-    df_ic = spark.createDataFrame(initial_conditions)
-    
-    # 3. Process partition-wise for efficiency
+    # 2. Process partition-wise for efficiency
     rdd_results = df_ic.rdd.mapPartitionsWithIndex(run_simulation)
     
     # 4. Define Output Schema
