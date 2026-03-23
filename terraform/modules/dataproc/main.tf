@@ -23,6 +23,15 @@ resource "google_dataproc_cluster" "main" {
       }
     }
 
+    software_config {
+      image_version       = "2.1-debian11"
+      optional_components = ["JUPYTER"]
+    }
+
+    endpoint_config {
+      enable_http_port_access = true
+    }
+
     gce_cluster_config {
       subnetwork       = var.vpc_subnetwork
       service_account  = var.service_account
