@@ -1,4 +1,5 @@
 import React from 'react';
+import * as THREE from 'three';
 
 export const EventHorizon: React.FC = () => {
   const r_s = 2; // Schwarzschild radius in our normalized units
@@ -16,5 +17,3 @@ export const EventHorizon: React.FC = () => {
     </mesh>
   );
 };
-
-import * as THREE from 'three';
