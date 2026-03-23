@@ -1,5 +1,7 @@
 # 🌌 Schwarzschild Black Hole Visualizer v1.0
 
+![Schwarzschild Black Hole](docs/assets/black_hole.png)
+
 A high-fidelity, distributed physics simulation and interactive 3D visualizer using GCP Dataproc, BigQuery, FastAPI, and React Three Fiber.
 
 ## 🏗️ End-to-End Architecture
