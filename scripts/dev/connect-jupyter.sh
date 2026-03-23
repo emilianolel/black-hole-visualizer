@@ -20,11 +20,14 @@ stop_tunnel() {
     # 1. Try stopping by PID file
     if [ -f "$PID_FILE" ]; then
         PID=$(cat "$PID_FILE")
-        if ps -p "$PID" > /dev/null; then
-            echo "Stopping SSH tunnel (PID: $PID)..."
-            kill "$PID" 2>/dev/null
+        # Check if PID is a valid integer to avoid "Invalid process id" errors
+        if [[ "$PID" =~ ^[0-9]+$ ]]; then
+            if ps -p "$PID" > /dev/null; then
+                echo "Stopping SSH tunnel (PID: $PID)..."
+                kill "$PID" 2>/dev/null
+            fi
         fi
-        rm "$PID_FILE"
+        rm -f "$PID_FILE"
     fi
 
     # 2. Safety check: ensure no residual process is listening on the port
