@@ -48,7 +48,8 @@ if ! gcloud iam service-accounts describe "${SA_EMAIL}" --project="${PROJECT_ID}
     gcloud iam service-accounts create "${SA_NAME}" \
         --display-name="Black Hole Visualizer Admin" \
         --project="${PROJECT_ID}"
-    echo "✅ Service Account creada."
+    echo "✅ Service Account creada. Esperando propagación (5s)..."
+    sleep 5
 else
     echo "ℹ️  La Service Account ya existe."
 fi
@@ -57,16 +58,14 @@ fi
 echo "🛡️  Asignando roles..."
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
     --member="serviceAccount:${SA_EMAIL}" \
-    --role="roles/owner" \
-    --condition=None
+    --role="roles/owner"
 
 # 5. Configurar Impersonación para el operador
 echo "🔐 Configurando impersonación para ${OPERATOR_EMAIL}..."
 gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
     --project="${PROJECT_ID}" \
     --role="roles/iam.serviceAccountTokenCreator" \
-    --member="user:${OPERATOR_EMAIL}" \
-    --condition=None
+    --member="user:${OPERATOR_EMAIL}"
 
 echo "════════════════════════════════════════════════════════════════"
 echo "  ✅ Bootstrap del Black Hole Visualizer completado"
