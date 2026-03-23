@@ -12,10 +12,11 @@ start() {
     fi
 
     echo "🚀 Starting Black Hole Visualizer Frontend..."
+    BASE_DIR=$(pwd)
     cd "$VITE_DIR" || exit
-    npm run dev -- --host > ../scripts/frontend/vite.log 2>&1 &
+    npm run dev -- --host > "$BASE_DIR/vite.log" 2>&1 &
     NEW_PID=$!
-    echo $NEW_PID > "../scripts/frontend/$PID_FILE"
+    echo $NEW_PID > "$BASE_DIR/$PID_FILE"
     cd - > /dev/null
     echo "✅ Frontend started with PID: $NEW_PID"
     echo "📡 URL: http://localhost:5173"

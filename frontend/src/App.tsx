@@ -6,7 +6,7 @@ import { PhotonPath } from './components/PhotonPath';
 import { RefreshCw, Zap } from 'lucide-react';
 
 // API Configuration
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "http://localhost:8000";
 
 function App() {
   const [photons, setPhotons] = useState<any>({});
