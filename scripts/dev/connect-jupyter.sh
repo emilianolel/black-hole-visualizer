@@ -68,7 +68,18 @@ if [ -z "$MASTER_NODE" ]; then
 fi
 echo "Found Master: $MASTER_NODE"
 
-# 2. Start SSH Tunnel
+# 2. Pre-flight: Sync SSH Keys
+# This step automates the manual "SSH button" click in the console by 
+# explicitly pushing your public key to your GCP OS Login profile.
+echo "Synchronizing SSH keys with GCP OS Login (Pre-flight)..."
+if [ ! -f "$HOME/.ssh/google_compute_engine.pub" ]; then
+    echo "Generating new Google Compute Engine SSH keys..."
+    ssh-keygen -t rsa -f "$HOME/.ssh/google_compute_engine" -C "$USER" -N ""
+fi
+gcloud compute os-login ssh-keys add --key-file="$HOME/.ssh/google_compute_engine.pub" --ttl=1d --quiet 2>/dev/null
+echo "Keys synchronized."
+
+# 3. Start SSH Tunnel
 echo "Establishing SSH tunnel on port $LOCAL_PORT..."
 gcloud compute ssh "$MASTER_NODE" --project "$PROJECT_ID" --tunnel-through-iap -- -L "$LOCAL_PORT:localhost:$REMOTE_PORT" -N -f
 echo $! > "$PID_FILE"
