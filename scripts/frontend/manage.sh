@@ -1,5 +1,6 @@
 #!/bin/bash
-# manage.sh — Lifecycle manager for the Frontend Dev Server.
+# Move to the directory where this script is located
+cd "$(dirname "$0")" || exit
 
 PID_FILE="vite.pid"
 VITE_DIR="../../frontend"
