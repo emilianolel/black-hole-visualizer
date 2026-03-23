@@ -15,6 +15,7 @@ locals {
     "roles/dataproc.worker",
     "roles/storage.objectAdmin",
     "roles/bigquery.dataEditor",
+    "roles/bigquery.jobUser",
     "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
   ]
