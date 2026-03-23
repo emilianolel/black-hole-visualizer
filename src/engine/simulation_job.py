@@ -54,7 +54,7 @@ def main():
     ])
 
     # 2. Generate Initial Conditions (Pro Mirroring approach)
-    num_photons = 100
+    num_photons = 10000
     r_start = 20.0
     
     # We use a generator to keep driver memory footprint minimal
