@@ -94,6 +94,13 @@ resource "google_project_iam_member" "iam_service_account_user" {
 resource "google_project_iam_member" "compute_os_login" {
   for_each = toset(var.terraform_operators)
   project  = local.project_id
-  role     = "roles/compute.osLogin"
+  role     = "roles/compute.osAdminLogin"
+  member   = each.value
+}
+
+resource "google_project_iam_member" "compute_instance_admin" {
+  for_each = toset(var.terraform_operators)
+  project  = local.project_id
+  role     = "roles/compute.instanceAdmin.v1"
   member   = each.value
 }
