@@ -70,13 +70,13 @@ echo "Found Master: $MASTER_NODE"
 
 # 2. Start SSH Tunnel
 echo "Establishing SSH tunnel on port $LOCAL_PORT..."
-gcloud compute ssh "$MASTER_NODE" --project "$PROJECT_ID" -- -L "$LOCAL_PORT:localhost:$REMOTE_PORT" -N -f
+gcloud compute ssh "$MASTER_NODE" --project "$PROJECT_ID" --tunnel-through-iap -- -L "$LOCAL_PORT:localhost:$REMOTE_PORT" -N -f
 echo $! > "$PID_FILE"
 
 # 3. Retrieve Security Token
 echo "Retrieving Jupyter Token (this may take a moment)..."
 # We try to get the active token from the internal docker container
-TOKEN_URL=$(gcloud compute ssh "$MASTER_NODE" --project "$PROJECT_ID" \
+TOKEN_URL=$(gcloud compute ssh "$MASTER_NODE" --project "$PROJECT_ID" --tunnel-through-iap \
     --command "sudo docker exec dataproc-jupyter-notebook jupyter server list" 2>/dev/null | grep -o 'http://localhost:[0-9]*/?token=[a-z0-9]*' | head -n 1)
 
 if [ -z "$TOKEN_URL" ]; then

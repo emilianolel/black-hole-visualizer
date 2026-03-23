@@ -58,7 +58,7 @@ resource "google_compute_router" "router" {
   network = google_compute_network.vpc.id
 }
 
-# Cloud NAT: allows nodes in private subnets to reach the internet (required for GKE/Composer)
+# Cloud NAT: allows nodes in private subnets to reach the internet
 resource "google_compute_router_nat" "nat" {
   name                               = "${var.env}-nat"
   project                            = var.project_id
@@ -71,4 +71,19 @@ resource "google_compute_router_nat" "nat" {
     enable = true
     filter = "ERRORS_ONLY"
   }
+}
+
+# Identity-Aware Proxy (IAP) rule: allows secure SSH without public Port 22
+resource "google_compute_firewall" "iap_ssh" {
+  name    = "${var.env}-allow-iap-ssh"
+  project = var.project_id
+  network = google_compute_network.vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  target_tags   = ["dataproc"]
+  source_ranges = ["35.235.240.0/20"] # GCP IAP IP range
 }
