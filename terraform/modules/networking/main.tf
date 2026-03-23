@@ -1,12 +1,12 @@
 ###############################################################################
-# Módulo: Networking — VPC, subnets y reglas de firewall
+# Module: Networking — VPC, subnets, and firewall rules
 ###############################################################################
 
 resource "google_compute_network" "vpc" {
   name                    = "${var.env}-data-vpc"
   project                 = var.project_id
   auto_create_subnetworks = false
-  description             = "VPC principal para entorno ${var.env}"
+  description             = "Main VPC for ${var.env} environment"
 }
 
 resource "google_compute_subnetwork" "data_subnet" {
@@ -29,7 +29,7 @@ resource "google_compute_subnetwork" "data_subnet" {
   }
 }
 
-# Regla: permite tráfico interno dentro de la VPC
+# Rule: allows internal traffic within the VPC
 resource "google_compute_firewall" "internal" {
   name    = "${var.env}-allow-internal"
   project = var.project_id
@@ -50,7 +50,7 @@ resource "google_compute_firewall" "internal" {
   source_ranges = [var.subnet_cidr]
 }
 
-# Router para Cloud NAT
+# Router for Cloud NAT
 resource "google_compute_router" "router" {
   name    = "${var.env}-router"
   project = var.project_id
@@ -58,7 +58,7 @@ resource "google_compute_router" "router" {
   network = google_compute_network.vpc.id
 }
 
-# Cloud NAT: permite que nodos en subredes privadas salgan a internet (necesario para GKE/Composer)
+# Cloud NAT: allows nodes in private subnets to reach the internet (required for GKE/Composer)
 resource "google_compute_router_nat" "nat" {
   name                               = "${var.env}-nat"
   project                            = var.project_id

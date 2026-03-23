@@ -1,9 +1,9 @@
 output "enabled_apis" {
-  description = "APIs habilitadas en el proyecto"
+  description = "Enabled APIs in the project"
   value       = [for svc in google_project_service.apis : svc.service]
 }
 
 output "terraform_admin_sa_email" {
-  description = "Email de la Service Account de administración de Terraform"
+  description = "Email of the Terraform administration Service Account"
   value       = google_service_account.terraform_admin.email
 }

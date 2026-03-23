@@ -1,29 +1,29 @@
 variable "project_id" {
-  description = "ID del proyecto GCP"
+  description = "GCP Project ID"
   type        = string
 }
 
 variable "region" {
-  description = "Región de GCP"
+  description = "GCP Region"
   type        = string
 }
 
 variable "env" {
-  description = "Entorno (dev, prod)"
+  description = "Environment (dev, prod)"
   type        = string
 }
 
 variable "subnet_cidr" {
-  description = "Rango de IP para la subred principal"
+  description = "IP range for the main subnet"
   type        = string
 }
 
 variable "pods_cidr" {
-  description = "Rango de IP secundario para los Pods de GKE"
+  description = "Secondary IP range for GKE Pods"
   type        = string
 }
 
 variable "services_cidr" {
-  description = "Rango de IP secundario para los Servicios de GKE"
+  description = "Secondary IP range for GKE Services"
   type        = string
 }

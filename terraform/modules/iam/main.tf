@@ -1,15 +1,15 @@
 ###############################################################################
-# Módulo: IAM — Service Accounts y bindings para cada servicio
+# Module: IAM — Service Accounts and bindings for each service
 ###############################################################################
 
-# Service Account para Dataproc cluster nodes
+# Service Account for Dataproc cluster nodes
 resource "google_service_account" "dataproc_worker" {
   account_id   = "${var.env}-dataproc-worker"
   display_name = "Dataproc Worker SA — ${var.env}"
   project      = var.project_id
 }
 
-# Roles necesarios para Dataproc
+# Necessary roles for Dataproc
 locals {
   dataproc_roles = [
     "roles/dataproc.worker",

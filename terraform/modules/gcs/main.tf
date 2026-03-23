@@ -1,5 +1,5 @@
 ###############################################################################
-# Módulo: GCS — Infraestructura para el Black Hole Visualizer
+# Module: GCS — Infrastructure for Black Hole Visualizer
 ###############################################################################
 
 locals {

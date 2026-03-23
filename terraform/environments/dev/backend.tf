@@ -18,7 +18,7 @@ provider "google" {
   project = var.project_id
   region  = var.region
 
-  # Reemplaza con el email real de la SA después del bootstrap:
+  # Replace with the actual SA email after bootstrap:
   impersonate_service_account = var.terraform_admin_sa
 }
 

@@ -1,34 +1,34 @@
 # 🌑 Black Hole Visualizer - Infrastructure
 
-Este sub-proyecto contiene la infraestructura optimizada para la simulación de geodésicas y renderizado de lentes gravitatorias utilizando **Google Cloud Dataproc** y **BigQuery**.
+This sub-project contains the optimized infrastructure for geodesic simulation and gravitational lensing rendering using **Google Cloud Dataproc** and **BigQuery**.
 
-## 🚀 Inicio Rápido
+## 🚀 Quickstart
 
-1.  **Instalación**: Ejecuta el script de requerimientos si no lo has hecho.
+1.  **Installation**: Run the requirements script if you haven't already.
     ```bash
     bash terraform/scripts/install_requirements.sh
     ```
-2.  **Bootstrap**: Inicializa el proyecto con el script dedicado (habilita APIs automáticamente).
+2.  **Bootstrap**: Initialize the project with the dedicated script (enables APIs automatically).
     ```bash
     bash terraform/scripts/init.sh PROJECT_ID STATE_BUCKET REGION OPERATOR_EMAIL
     ```
-3.  **Sincronización**: Si el proyecto ya existía o cambias de identificadores, usa el script de sincronización:
+3.  **Synchronization**: If the project already existed or you change identifiers, use the sync script:
     ```bash
     bash terraform/scripts/sync-project.sh PROJECT_ID STATE_BUCKET REGION OPERATOR_EMAIL
     ```
-4.  **Configuración**:
-    *   Copia `terraform/environments/dev/terraform.tfvars.example` a `terraform.tfvars`. (Ya no es necesario si usaste el paso anterior, pero sirve para personalización extra).
-5.  **Despliegue**:
+4.  **Configuration**:
+    *   Copy `terraform/environments/dev/terraform.tfvars.example` to `terraform.tfvars`. (No longer required if you used the previous step, but useful for extra customization).
+5.  **Deployment**:
     ```bash
     cd terraform/environments/dev
     terraform init -reconfigure
     terraform apply
     ```
 
-## 🛠️ Herramientas de Monitoreo
+## 🛠️ Monitoring Tools
 
-*   `bash terraform/scripts/audit.sh`: Lista los recursos activos del visualizador.
-*   `bash terraform/scripts/costs.sh`: Reporte de costos específico para este proyecto.
+*   `bash terraform/scripts/audit.sh`: Lists the active resources for the visualizer.
+*   `bash terraform/scripts/costs.sh`: Specific cost report for this project.
 
 ---
-Métrica de Schwarzschild | RK4 Integration | Distributed PySpark
+Schwarzschild Metric | RK4 Integration | Distributed PySpark

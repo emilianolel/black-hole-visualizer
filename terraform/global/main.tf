@@ -1,5 +1,5 @@
 ###############################################################################
-# Global — Habilita las APIs de GCP y crea la Service Account de Terraform
+# Global — Enables GCP APIs and creates the Terraform Service Account
 ###############################################################################
 
 locals {
@@ -7,7 +7,7 @@ locals {
   region     = var.region
 }
 
-# Habilita las APIs necesarias
+# Enable required APIs
 resource "google_project_service" "apis" {
   for_each = toset(var.gcp_service_apis)
 
@@ -17,13 +17,13 @@ resource "google_project_service" "apis" {
   disable_on_destroy         = false
 }
 
-# Obtiene datos del proyecto actual (como el ID numérico)
+# Get current project data (like numeric ID)
 data "google_project" "project" {
   project_id = local.project_id
 }
 
-# Cloud Composer 2 requiere un permiso especial para su Service Agent gestionado por Google
-# Este rol permite al agente gestionar las SAs de los nodos del entorno Composer.
+# Cloud Composer 2 requires a special permission for its Google-managed Service Agent
+# This role allows the agent to manage SAs for the Composer environment nodes.
 resource "google_project_iam_member" "composer_agent_v2_ext" {
   project = local.project_id
   role    = "roles/composer.ServiceAgentV2Ext"
@@ -33,19 +33,19 @@ resource "google_project_iam_member" "composer_agent_v2_ext" {
 }
 
 ###############################################################################
-# Service Account de administración de Terraform
-# Esta SA reemplaza el uso de cuentas personales para gestionar la infra.
-# Se usa mediante impersonación: tu cuenta personal delega en esta SA.
+# Terraform Administration Service Account
+# This SA replaces the use of personal accounts for managing infrastructure.
+# It is used via impersonation: your personal account delegates to this SA.
 ###############################################################################
 
 resource "google_service_account" "terraform_admin" {
   account_id   = "terraform-admin"
-  display_name = "Terraform Admin — Gestión de infraestructura de datos"
-  description  = "SA utilizada por Terraform para crear y gestionar todos los recursos del proyecto de datos."
+  display_name = "Terraform Admin — Data infrastructure management"
+  description  = "SA used by Terraform to create and manage all resources in the data project."
   project      = local.project_id
 }
 
-# Roles necesarios para que la SA pueda gestionar los servicios simplificados
+# Necessary roles for the SA to manage simplified services
 locals {
   terraform_admin_roles = [
     "roles/bigquery.admin",
@@ -69,8 +69,8 @@ resource "google_project_iam_member" "terraform_admin_roles" {
   member  = "serviceAccount:${google_service_account.terraform_admin.email}"
 }
 
-# Permite que tu cuenta personal (o grupo) impersone esta SA
-# Sustituye var.terraform_operators por los emails que necesiten acceso
+# Allows your personal account (or group) to impersonate this SA
+# Substitute var.terraform_operators with the emails that need access
 resource "google_service_account_iam_binding" "impersonation" {
   service_account_id = google_service_account.terraform_admin.name
   role               = "roles/iam.serviceAccountTokenCreator"

@@ -1,94 +1,94 @@
 # 🌑 Black Hole Visualizer
 
-Este proyecto utiliza la potencia de **Google Cloud Platform** para simular y renderizar la distorsión de la luz (lentes gravitatorias) causada por agujeros negros, utilizando la métrica de **Schwarzschild** y métodos numéricos avanzados.
+This project leverages the power of **Google Cloud Platform** to simulate and render light distortion (gravitational lensing) caused by black holes, using the **Schwarzschild metric** and advanced numerical methods.
 
-## 🎯 Objetivo
-Crear una plataforma capaz de procesar millones de geodésicas (trayectorias de luz) de forma distribuida, almacenando los resultados para un renderizado interactivo en tiempo real.
+## 🎯 Objective
+Create a platform capable of processing millions of geodesics (light paths) in a distributed manner, storing the results for real-time interactive rendering.
 
 ---
 
-## 🏗️ Arquitectura General
+## 🏗️ General Architecture
 
 ```mermaid
 graph TD
-    subgraph "Nube (GCP)"
+    subgraph "Cloud (GCP)"
         INFRA["Terraform (VPC, IAM)"]
         GCS[("Cloud Storage (Scripts & Raw Data)")]
         DP["Dataproc (PySpark - RK4 Engine)"]
         BQ[("BigQuery (Curated Paths)")]
     end
 
-    subgraph "Visualización"
+    subgraph "Visualization"
         FE["React Dashboard (Vite)"]
     end
 
     INFRA --> GCS
     GCS --> DP
-    DP -->|Simulación RK4| BQ
+    DP -->|RK4 Simulation| BQ
     BQ -->|API Query| FE
-    FE -->|Renderizado| Usuario
+    FE -->|Rendering| User
 ```
 
 ---
 
-## 🗺️ Roadmap del Proyecto
+## 🗺️ Project Roadmap
 
-### **Fase 1: Infraestructura (Completado) ✅**
-- Despliegue de red VPC y Cloud NAT.
-- Módulos de Terraform para GCS, BigQuery y Dataproc.
-- Scripts de automatización:
-    - `init.sh`: Bootstrap completo del proyecto (incluye habilitación automática de APIs).
-    - `sync-project.sh`: Sincronización masiva de identificadores (Project ID, Región, Buckets) en toda la configuración.
-    - `audit.sh`: Reporte rápido de recursos activos.
-    - `costs.sh`: Estimación de costos mensuales.
-- Configuración de VM de gestión con IP estática.
+### **Phase 1: Infrastructure (Completed) ✅**
+- Deployment of VPC network and Cloud NAT.
+- Terraform modules for GCS, BigQuery, and Dataproc.
+- Automation scripts:
+    - `init.sh`: Full project bootstrap (includes automatic API enablement).
+    - `sync-project.sh`: Bulk synchronization of identifiers (Project ID, Region, Buckets) across the configuration.
+    - `audit.sh`: Quick report of active resources.
+    - `costs.sh`: Monthly cost estimation.
+- Management VM configuration with static IP.
 
-### **Fase 2: Motor de Simulación (En progreso) 🛠️**
-- Implementación del integrador **RK4 (Runge-Kutta 4th Order)**.
-- Transformación de coordenadas de coordenadas de Boyer-Lindquist a Cartesianas.
-- Distribución de carga de trabajo mediante **PySpark** en Dataproc.
+### **Phase 2: Simulation Engine (In Progress) 🛠️**
+- Implementation of the **RK4 (Runge-Kutta 4th Order)** integrator.
+- Transformation of Boyer-Lindquist coordinate components to Cartesian.
+- Workload distribution using **PySpark** on Dataproc.
 
-### **Fase 3: Pipeline de Datos**
-- Ingesta de resultados de simulación en BigQuery.
-- Optimización de esquemas para consultas rápidas de partículas de luz.
+### **Phase 3: Data Pipeline**
+- Simulation result ingestion into BigQuery.
+- Schema optimization for fast light particle queries.
 
-### **Fase 4: Visualización e Interfaz**
-- Desarrollo del Dashboard interactivo en React.
-- Implementación de ray-tracing simplificado en el cliente basado en la data de BigQuery.
+### **Phase 4: Visualization and Interface**
+- Interactive Dashboard development in React.
+- Simplified client-side ray-tracing implementation based on BigQuery data.
 
-### **Fase 5: Optimización y Lanzamiento**
-- Pruebas de estrés con millones de fotones.
-- Limpieza final para publicación Open Source.
+### **Phase 5: Optimization and Launch**
+- Stress tests with millions of photons.
+- Final cleanup for Open Source publication.
 
 ---
 
-## 🚀 Guía de Inicio Rápido
+## 🚀 Quickstart Guide
 
-### 1. Inicialización (Bootstrap)
-Prepara el proyecto de GCP, crea el bucket de estado y la cuenta de servicio administrativa:
+### 1. Initialization (Bootstrap)
+Prepare the GCP project, create the state bucket, and the administrative service account:
 ```bash
 bash terraform/scripts/init.sh [PROJECT_ID] [STATE_BUCKET] [REGION] [USER_EMAIL]
 ```
 
-### 2. Sincronización de Identificadores
-Si necesitas cambiar de proyecto o región en el futuro, usa el script de sincronización:
+### 2. Identifier Synchronization
+If you need to change project or region in the future, use the synchronization script:
 ```bash
 bash terraform/scripts/sync-project.sh [PROJECT_ID] [STATE_BUCKET] [REGION] [USER_EMAIL]
 ```
 
-### 3. Despliegue de Infraestructura
-Consulta las instrucciones detalladas en la carpeta de Terraform:
-👉 [**Instrucciones de Infraestructura (Terraform)**](./terraform/README.md)
+### 3. Infrastructure Deployment
+Consult the detailed instructions in the Terraform folder for module deployment:
+👉 [**Infrastructure Instructions (Terraform)**](./terraform/README.md)
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## 🛠️ Technologies Used
 
-- **Infraestructura**: Terraform, GCP (Dataproc, BigQuery, GCS, GCE).
-- **Automatización**: Bash scripting (Init, Sync, Audit, Costs).
-- **Procesamiento**: Python, PySpark.
-- **Matemáticas**: RK4 Integration, Schwarzschild Metric.
+- **Infrastructure**: Terraform, GCP (Dataproc, BigQuery, GCS, GCE).
+- **Automation**: Bash scripting (Init, Sync, Audit, Costs).
+- **Processing**: Python, PySpark.
+- **MathematiCS**: RK4 Integration, Schwarzschild Metric.
 - **Frontend**: React, Vite, Nginx.
 
 ---
-*Explorando el horizonte de sucesos con datos masivos.*
+*Exploring the event horizon with big data and automation.*

@@ -1,12 +1,12 @@
 ###############################################################################
-# Módulo: BigQuery — Infraestructura para el Black Hole Visualizer
+# Module: BigQuery — Infrastructure for Black Hole Visualizer
 ###############################################################################
 
 resource "google_bigquery_dataset" "raw" {
   dataset_id  = "bh_raw"
   project     = var.project_id
   location    = var.region
-  description = "Datos crudos de imágenes astronómicas"
+  description = "Raw astronomical image data"
 
   labels = {
     env     = var.env
@@ -18,7 +18,7 @@ resource "google_bigquery_dataset" "staging" {
   dataset_id  = "bh_staging"
   project     = var.project_id
   location    = var.region
-  description = "Datos temporales de trazo de rayos"
+  description = "Staging data for ray tracing"
 
   labels = {
     env     = var.env
@@ -30,7 +30,7 @@ resource "google_bigquery_dataset" "analytics" {
   dataset_id  = "bh_analytics"
   project     = var.project_id
   location    = var.region
-  description = "Resultados finales de geodésicas y métricas"
+  description = "Final results for geodesics and metrics"
 
   labels = {
     env     = var.env

@@ -1,12 +1,12 @@
 ###############################################################################
-# Backend remoto — Estado de Terraform almacenado en GCS
-# IMPORTANTE: Este bucket debe existir ANTES de inicializar Terraform.
-# Créalo manualmente o usando el script scripts/init.sh
+# Remote Backend — Terraform State stored in GCS
+# IMPORTANT: This bucket must exist BEFORE initializing Terraform.
+# Create it manually or using the scripts/init.sh script
 ###############################################################################
 
 terraform {
   backend "gcs" {
-    # Reemplaza con el nombre real de tu bucket de estado
+    # Replace with the actual name of your state bucket
     bucket = "bh-tf-state-dnqxxt-bucket"
     prefix = "terraform/global"
   }
@@ -21,21 +21,21 @@ terraform {
   }
 }
 
-# NOTA DE BOOTSTRAP:
-# La PRIMERA vez debes ejecutar esto con tu cuenta personal (tiene roles de owner/admin):
+# BOOTSTRAP NOTE:
+# The FIRST time you must run this with your personal account (with owner/admin roles):
 #   gcloud auth application-default login
-#   terraform apply  ← Crea la SA y le asigna roles
+#   terraform apply  ← Creates the SA and assigns roles
 #
-# DESPUÉS del bootstrap, usa siempre impersonación:
+# AFTER bootstrap, always use impersonation:
 #   export TF_VAR_impersonate_sa="terraform-admin@YOUR_PROJECT.iam.gserviceaccount.com"
 #   terraform apply
 #
-# O configura impersonate_service_account directamente en el bloque provider:
+# Or configure impersonate_service_account directly in the provider block:
 provider "google" {
   project = var.project_id
   region  = var.region
 
-  # Descomenta y reemplaza con el email de la SA una vez creada con bootstrap:
+  # Uncomment and replace with the SA email once created with bootstrap:
   impersonate_service_account = "bh-vis-admin@black-hole-visualizer-project.iam.gserviceaccount.com"
 }
 

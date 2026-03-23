@@ -1,16 +1,16 @@
 variable "project_id" {
-  description = "ID del proyecto en GCP"
+  description = "GCP Project ID"
   type        = string
 }
 
 variable "region" {
-  description = "Región principal de GCP"
+  description = "Core GCP Region"
   type        = string
   default     = "northamerica-northeast2"
 }
 
 variable "gcp_service_apis" {
-  description = "Lista de APIs de GCP a habilitar"
+  description = "List of GCP APIs to enable"
   type        = list(string)
   default = [
     "compute.googleapis.com",
@@ -28,10 +28,10 @@ variable "gcp_service_apis" {
 
 variable "terraform_operators" {
   description = <<-EOT
-    Lista de identidades que pueden impersonar la SA terraform-admin.
-    Formato: ["user:tu@email.com", "group:equipo@dominio.com"]
-    Estas identidades podrán ejecutar Terraform localmente o en CI/CD
-    sin necesitar roles de administrador directamente en su cuenta.
+    List of identities allowed to impersonate the terraform-admin SA.
+    Format: ["user:you@email.com", "group:team@domain.com"]
+    These identities can run Terraform locally or in CI/CD 
+    without requiring admin roles directly on their personal account.
   EOT
   type        = list(string)
 }

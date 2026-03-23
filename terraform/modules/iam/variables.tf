@@ -1,9 +1,9 @@
 variable "project_id" {
-  description = "ID del proyecto GCP"
+  description = "GCP Project ID"
   type        = string
 }
 
 variable "env" {
-  description = "Entorno (dev, prod)"
+  description = "Environment (dev, prod)"
   type        = string
 }

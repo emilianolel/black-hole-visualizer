@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ###############################################################################
-# costs.sh — Reporte de costos para el Black Hole Visualizer
+# costs.sh — Cost report for the Black Hole Visualizer
 ###############################################################################
 
 set -euo pipefail
@@ -13,11 +13,11 @@ echo "----------------------------------------------------------"
 echo "🛰️  Project: $PROJECT_ID"
 echo "----------------------------------------------------------"
 
-# 1. Verificar APIs habilitadas
-echo "📊 Servicios activos facturables:"
-gcloud services list --project="${PROJECT_ID}" --enabled --filter="name:googleapis.com" --format="value(config.title)" | grep -E "Compute|Storage|BigQuery|Dataproc" | xargs -I {} echo "   - {} [ACTIVO]"
+# 1. Verify enabled APIs
+echo "📊 Billable active services:"
+gcloud services list --project="${PROJECT_ID}" --enabled --filter="name:googleapis.com" --format="value(config.title)" | grep -E "Compute|Storage|BigQuery|Dataproc" | xargs -I {} echo "   - {} [ACTIVE]"
 
 echo "----------------------------------------------------------"
-echo "💡 Nota: Para obtener el MONTO EXACTO EN USD desglosado por servicio,"
-echo "   Google requiere habilitar la exportación a BigQuery."
+echo "💡 Note: To get the EXACT AMOUNT IN USD broken down by service,"
+echo "   Google requires enabling BigQuery export."
 echo "----------------------------------------------------------"

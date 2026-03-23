@@ -1,6 +1,6 @@
 ###############################################################################
-# Entorno: DEV
-# Este archivo invoca todos los módulos necesarios para el entorno de desarrollo
+# Environment: DEV
+# This file invokes all necessary modules for the development environment
 ###############################################################################
 
 module "networking" {

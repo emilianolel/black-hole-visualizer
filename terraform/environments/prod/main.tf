@@ -1,6 +1,6 @@
 ###############################################################################
-# Entorno: PROD
-# Este archivo invoca todos los módulos necesarios para el entorno de producción
+# Environment: PROD
+# This file invokes all necessary modules for the production environment
 ###############################################################################
 
 module "networking" {

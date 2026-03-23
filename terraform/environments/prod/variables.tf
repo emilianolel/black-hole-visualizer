@@ -1,36 +1,36 @@
 variable "project_id" {
-  description = "ID del proyecto en GCP"
+  description = "GCP Project ID"
   type        = string
 }
 
 variable "region" {
-  description = "Región principal de GCP"
+  description = "Core GCP Region"
   type        = string
   default     = "northamerica-northeast2"
 }
 
 variable "env" {
-  description = "Nombre del entorno (dev, prod)"
+  description = "Environment name (dev, prod)"
   type        = string
 }
 
 variable "subnet_cidr" {
-  description = "Rango de IP para la subred principal"
+  description = "IP range for the main subnet"
   type        = string
 }
 
 variable "pods_cidr" {
-  description = "Rango de IP secundario para los Pods de GKE/Dataproc"
+  description = "Secondary IP range for GKE/Dataproc Pods (if applicable)"
   type        = string
 }
 
 variable "services_cidr" {
-  description = "Rango de IP secundario para los Servicios de GKE/Dataproc"
+  description = "Secondary IP range for GKE/Dataproc Services (if applicable)"
   type        = string
 }
 
 variable "terraform_admin_sa" {
-  description = "Email de la SA terraform-admin usada para impersonación. Ejemplo: terraform-admin@PROJECT_ID.iam.gserviceaccount.com"
+  description = "Email of the terraform-admin SA used for impersonation. Example: terraform-admin@PROJECT_ID.iam.gserviceaccount.com"
   type        = string
 }
 

@@ -1,36 +1,36 @@
 variable "project_id" {
-  description = "ID del proyecto GCP"
+  description = "GCP Project ID"
   type        = string
 }
 
 variable "region" {
-  description = "Región de GCP"
+  description = "GCP Region"
   type        = string
 }
 
 variable "zone" {
-  description = "Zona de GCP"
+  description = "GCP Zone"
   type        = string
   default     = "northamerica-northeast2-a"
 }
 
 variable "env" {
-  description = "Entorno (dev, prod)"
+  description = "Environment (dev, prod)"
   type        = string
 }
 
 variable "vpc_network" {
-  description = "ID de la VPC"
+  description = "VPC network ID"
   type        = string
 }
 
 variable "vpc_subnetwork" {
-  description = "ID de la subred"
+  description = "Subnetwork ID"
   type        = string
 }
 
 variable "machine_type" {
-  description = "Tipo de máquina"
+  description = "Machine type"
   type        = string
   default     = "e2-medium"
 }

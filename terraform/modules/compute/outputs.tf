@@ -1,6 +1,6 @@
-output "external_ip" {
+output "static_ip" {
+  description = "Static external IP for the VM"
   value       = google_compute_address.static_ip.address
-  description = "IP externa estática de la VM"
 }
 
 output "instance_name" {
