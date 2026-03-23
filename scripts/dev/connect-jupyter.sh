@@ -93,7 +93,7 @@ echo "Keys synchronized."
 # reliably regardless of container mount points.
 echo "Staging physics engine in GCS..."
 BUCKET_NAME="black-hole-visualizer-project-bh-vis-dataproc-config"
-gsutil cp "src/engine/integrator.py" "gs://${BUCKET_NAME}/notebooks/integrator.py" --quiet 2>/dev/null
+gcloud storage cp "src/engine/integrator.py" "gs://${BUCKET_NAME}/notebooks/integrator.py" --quiet 2>/dev/null
 echo "Engine logic staged in GCS."
 
 # 4. Start SSH Tunnel
