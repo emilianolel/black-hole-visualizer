@@ -22,16 +22,6 @@ data "google_project" "project" {
   project_id = local.project_id
 }
 
-# Cloud Composer 2 requires a special permission for its Google-managed Service Agent
-# This role allows the agent to manage SAs for the Composer environment nodes.
-resource "google_project_iam_member" "composer_agent_v2_ext" {
-  project = local.project_id
-  role    = "roles/composer.ServiceAgentV2Ext"
-  member  = "serviceAccount:service-${data.google_project.project.number}@cloudcomposer-accounts.iam.gserviceaccount.com"
-
-  depends_on = [google_project_service.apis]
-}
-
 ###############################################################################
 # Terraform Administration Service Account
 # This SA replaces the use of personal accounts for managing infrastructure.
