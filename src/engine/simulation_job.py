@@ -40,29 +40,38 @@ def main():
 
     sc = spark.sparkContext
     
-    # 1. Generate Initial Conditions (Simple dummy grid for testing)
-    # In a real run, this would be a complex camera model
-    num_photons = 1000
-    r_start = 20.0
-    initial_conditions = []
-    
-    for i in range(num_photons):
-        phi = (2 * np.pi * i) / num_photons
-        ic = {
-            "photon_id": i,
-            "t0": 0.0, "r0": r_start, "theta0": np.pi/2, "phi0": phi,
-            "pt0": -1.0, "pr0": -0.5, "ptheta0": 0.0, "pphi0": 4.4 # Targeted at BH
-        }
-        initial_conditions.append(ic)
+    # 1. Define IC Schema explicitly
+    ic_schema = StructType([
+        StructField("photon_id", IntegerType(), False),
+        StructField("t0", DoubleType(), False),
+        StructField("r0", DoubleType(), False),
+        StructField("theta0", DoubleType(), False),
+        StructField("phi0", DoubleType(), False),
+        StructField("pt0", DoubleType(), False),
+        StructField("pr0", DoubleType(), False),
+        StructField("ptheta0", DoubleType(), False),
+        StructField("pphi0", DoubleType(), False)
+    ])
 
-    # 2. Distribute with Spark
-    df_ic = spark.createDataFrame(initial_conditions)
+    # 2. Generate Initial Conditions (Pro Mirroring approach)
+    num_photons = 100
+    r_start = 20.0
     
-    # 3. Process partition-wise for efficiency
+    # We use a generator to keep driver memory footprint minimal
+    def generate_ics():
+        for i in range(num_photons):
+            phi = (2 * np.pi * i) / num_photons
+            yield (i, 0.0, r_start, np.pi/2, phi, -1.0, -0.5, 0.0, 4.4)
+
+    # 3. Create RDD first (More stable than direct DataFrame from list in some Spark versions)
+    ic_rdd = sc.parallelize(list(generate_ics()))
+    df_ic = spark.createDataFrame(ic_rdd, schema=ic_schema)
+    
+    # 4. Process partition-wise for maximum parallelism
     rdd_results = df_ic.rdd.mapPartitionsWithIndex(run_simulation)
     
-    # 4. Define Output Schema
-    schema = StructType([
+    # 5. Define Output Schema
+    output_schema = StructType([
         StructField("photon_id", IntegerType(), False),
         StructField("step", IntegerType(), False),
         StructField("r", DoubleType(), False),
@@ -70,10 +79,11 @@ def main():
         StructField("phi", DoubleType(), False)
     ])
     
-    # 5. Save results to GCS (Path from project metadata)
+    # 6. Save results to GCS
     output_path = "gs://black-hole-visualizer-project-bh-vis-dataproc-config/sim_results/phase2_test"
     
-    df_results = spark.createDataFrame(rdd_results, schema)
+    print(f"--- Starting Distributed Ray-Tracing for {num_photons} photons ---")
+    df_results = spark.createDataFrame(rdd_results, schema=output_schema)
     df_results.write.mode("overwrite").parquet(output_path)
     
     print(f"--- Simulation Complete! Results saved to {output_path} ---")

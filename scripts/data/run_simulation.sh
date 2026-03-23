@@ -30,7 +30,7 @@ gcloud dataproc jobs submit pyspark \
     --project="$PROJECT_ID" \
     --py-files="gs://${BUCKET_NAME}/deploy/src/engine/integrator.py" \
     --jars="gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar" \
-    --properties="spark.driver.memory=2g,spark.executor.memory=2g,spark.executor.memoryOverhead=1g"
+    --properties="spark.driver.memory=4g,spark.executor.memory=4g,spark.executor.memoryOverhead=2g,spark.sql.execution.arrow.pyspark.enabled=true"
 
 echo "----------------------------------------------------"
 echo "✅ Job submitted! Monitor progress in the GCP Console."
