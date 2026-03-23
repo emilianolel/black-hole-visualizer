@@ -49,6 +49,7 @@ locals {
     "roles/resourcemanager.projectIamAdmin",
     "roles/iam.securityAdmin",
     "roles/iap.tunnelResourceAccessor",
+    "roles/compute.viewer",
   ]
 }
 
@@ -68,10 +69,17 @@ resource "google_service_account_iam_binding" "impersonation" {
   members            = var.terraform_operators
 }
 
-# Allows personal accounts to use IAP tunneling
+# Allows personal accounts to use IAP tunneling and view instances
 resource "google_project_iam_member" "iap_tunnel_accessor" {
   for_each = toset(var.terraform_operators)
   project  = local.project_id
   role     = "roles/iap.tunnelResourceAccessor"
+  member   = each.value
+}
+
+resource "google_project_iam_member" "compute_viewer" {
+  for_each = toset(var.terraform_operators)
+  project  = local.project_id
+  role     = "roles/compute.viewer"
   member   = each.value
 }
