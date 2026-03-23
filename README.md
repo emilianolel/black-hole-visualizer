@@ -82,13 +82,30 @@ Consult the detailed instructions in the Terraform folder for module deployment:
 
 ---
 
-## 🛠️ Technologies Used
+## 📁 Project Structure
 
-- **Infrastructure**: Terraform, GCP (Dataproc, BigQuery, GCS, GCE).
-- **Automation**: Bash scripting (Init, Sync, Audit, Costs).
-- **Processing**: Python, PySpark.
-- **MathematiCS**: RK4 Integration, Schwarzschild Metric.
-- **Frontend**: React, Vite, Nginx.
+```text
+.
+├── terraform/          # Infrastructure as Code (GCP)
+│   ├── environments/   # Dev/Prod configurations
+│   ├── modules/        # Reusable GCS, BigQuery, Dataproc modules
+│   └── scripts/        # Terraform-specific automation
+├── src/
+│   ├── engine/         # PySpark RK4 Physics Engine
+│   ├── app/            # React Visualization Frontend
+│   └── api/            # FastAPI Data Bridge
+├── notebooks/          # Research & Math Validation
+├── docs/               # Architecture & Physics Documentation
+├── scripts/            # Global Project Utilities
+└── README.md           # This file
+```
+
+## 🛠 Technologies
+
+- **Infrastructure**: Terraform, Google Cloud Platform (GCS, BigQuery, Dataproc, Compute Engine).
+- **Physics Engine**: PySpark (Python), RK4 numerical integration.
+- **Frontend**: React, Three.js, WebGL.
+- **Backend API**: FastAPI (Python).
 
 ---
 *Exploring the event horizon with big data and automation.*
