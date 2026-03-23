@@ -12,73 +12,71 @@ except ImportError:
 
 def run_simulation(partition_id, iterator):
     """
-    Worker-side generator. Accessing row by attribute for performance.
+    Worker-side function to process a batch of photons.
     """
+    results = []
     for row in iterator:
-        photon_id = row.photon_id
+        photon_id = row['photon_id']
+        # Initial state: [t, r, theta, phi, pt, pr, ptheta, pphi]
         initial_state = np.array([
-            row.t0, row.r0, row.theta0, row.phi0,
-            row.pt0, row.pr0, row.ptheta0, row.pphi0
+            row['t0'], row['r0'], row['theta0'], row['phi0'],
+            row['pt0'], row['pr0'], row['ptheta0'], row['pphi0']
         ])
         
+        # Perform the trace
         path = integrator.trace_photon(initial_state, step_size=0.1, max_steps=500)
         
+        # Flatten the path for storage [step_index, r, theta, phi]
+        # We only store spatial coordinates to save space
         for i, state in enumerate(path):
-            yield (int(photon_id), int(i), float(state[1]), float(state[2]), float(state[3]))
-
-def generate_initial_conditions(photon_id, num_photons):
-    """
-    Worker-side function to generate initial conditions.
-    """
-    phi = (2 * np.pi * float(photon_id)) / num_photons
-    return (int(photon_id), 0.0, 20.0, float(np.pi/2), float(phi), -1.0, -0.5, 0.0, 4.4)
+            results.append((photon_id, i, float(state[1]), float(state[2]), float(state[3])))
+            
+    return iter(results)
 
 def main():
     spark = SparkSession.builder \
-        .appName("BlackHole-RayTracer-Phase2-Production") \
+        .appName("BlackHole-RayTracer-Phase2") \
         .getOrCreate()
-    
-    # 1. Define Explicit Schemas (Crucial for stability)
-    ic_schema = StructType([
-        StructField("photon_id", IntegerType(), False),
-        StructField("t0", DoubleType(), False),
-        StructField("r0", DoubleType(), False),
-        StructField("theta0", DoubleType(), False),
-        StructField("phi0", DoubleType(), False),
-        StructField("pt0", DoubleType(), False),
-        StructField("pr0", DoubleType(), False),
-        StructField("ptheta0", DoubleType(), False),
-        StructField("pphi0", DoubleType(), False)
-    ])
 
-    result_schema = StructType([
+    sc = spark.sparkContext
+    
+    # 1. Generate Initial Conditions (Simple dummy grid for testing)
+    # In a real run, this would be a complex camera model
+    num_photons = 1000
+    r_start = 20.0
+    initial_conditions = []
+    
+    for i in range(num_photons):
+        phi = (2 * np.pi * i) / num_photons
+        ic = {
+            "photon_id": i,
+            "t0": 0.0, "r0": r_start, "theta0": np.pi/2, "phi0": phi,
+            "pt0": -1.0, "pr0": -0.5, "ptheta0": 0.0, "pphi0": 4.4 # Targeted at BH
+        }
+        initial_conditions.append(ic)
+
+    # 2. Distribute with Spark
+    df_ic = spark.createDataFrame(initial_conditions)
+    
+    # 3. Process partition-wise for efficiency
+    rdd_results = df_ic.rdd.mapPartitionsWithIndex(run_simulation)
+    
+    # 4. Define Output Schema
+    schema = StructType([
         StructField("photon_id", IntegerType(), False),
         StructField("step", IntegerType(), False),
         StructField("r", DoubleType(), False),
         StructField("theta", DoubleType(), False),
         StructField("phi", DoubleType(), False)
     ])
-
-    # 2. Distributed Generation 
-    num_photons = 100000 
     
-    rdd_ic = spark.range(num_photons).repartition(200).rdd \
-        .map(lambda x: generate_initial_conditions(x.id, num_photons))
+    # 5. Save results to GCS (Path from project metadata)
+    output_path = "gs://black-hole-visualizer-project-bh-vis-dataproc-config/sim_results/phase2_test"
     
-    df_ic = spark.createDataFrame(rdd_ic, ic_schema)
-    
-    # 3. Distributed Integration
-    print("Launching relativistic ray-tracing across executors...")
-    rdd_results = df_ic.rdd.mapPartitionsWithIndex(run_simulation)
-    
-    # 4. Save to GCS
-    output_path = "gs://black-hole-visualizer-project-bh-vis-dataproc-config/sim_results/phase2_pro"
-    print(f"Tracking results and writing to {output_path}...")
-    
-    df_results = spark.createDataFrame(rdd_results, result_schema)
+    df_results = spark.createDataFrame(rdd_results, schema)
     df_results.write.mode("overwrite").parquet(output_path)
     
-    print(f"🏁 Simulation Successful! Results saved to {output_path}")
+    print(f"--- Simulation Complete! Results saved to {output_path} ---")
 
 if __name__ == "__main__":
     main()
