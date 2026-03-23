@@ -28,16 +28,12 @@ terraform init
 terraform apply
 ```
 
-### 2. API Backend (FastAPI)
-Initialize the high-speed data bridge.
+### 2. Application Control (Unified)
+You can now manage both the API and the Frontend with a single command:
 ```bash
-./scripts/api/dev.sh
-```
-
-### 3. Frontend Visualizer (React/Vite)
-Launch the 3D dashboard.
-```bash
-./scripts/frontend/dev.sh
+./scripts/manage.sh start     # 🚀 Launch everything
+./scripts/manage.sh stop      # 🛑 Stop all services
+./scripts/manage.sh status    # 📊 Check system health
 ```
 
 ---
@@ -65,7 +61,7 @@ Transfers simulation results from GCS to the analytical warehouse.
 ```
 
 ### Step C: Explore in 3D
-Open [http://localhost:5173](http://localhost:5173), adjust the "RAY INTENSITY" slider, and click **Load Photons**.
+Run `./scripts/manage.sh start`, open [http://localhost:5173](http://localhost:5173), adjust the "RAY INTENSITY" slider, and click **Load Photons**.
 **Diagram:**
 ```text
 [ BigQuery ] -> [ FastAPI (BQ Client) ] -> [ JSON ] -> [ Three.js Line (BufferGeometry) ]
