@@ -1,111 +1,119 @@
-# 🌑 Black Hole Visualizer
+# 🌌 Schwarzschild Black Hole Visualizer v1.0
 
-This project leverages the power of **Google Cloud Platform** to simulate and render light distortion (gravitational lensing) caused by black holes, using the **Schwarzschild metric** and advanced numerical methods.
+A high-fidelity, distributed physics simulation and interactive 3D visualizer using GCP Dataproc, BigQuery, FastAPI, and React Three Fiber.
 
-## 🎯 Objective
-Create a platform capable of processing millions of geodesics (light paths) in a distributed manner, storing the results for real-time interactive rendering.
-
----
-
-## 🏗️ General Architecture
-
-```mermaid
-graph TD
-    subgraph "Cloud (GCP)"
-        INFRA["Terraform (VPC, IAM)"]
-        GCS[("Cloud Storage (Scripts & Raw Data)")]
-        DP["Dataproc (PySpark - RK4 Engine)"]
-        BQ[("BigQuery (Curated Paths)")]
-    end
-
-    subgraph "Visualization"
-        FE["React Dashboard (Vite)"]
-    end
-
-    INFRA --> GCS
-    GCS --> DP
-    DP -->|RK4 Simulation| BQ
-    BQ -->|API Query| FE
-    FE -->|Rendering| User
-```
-
----
-
-## 🗺️ Project Roadmap
-
-### **Phase 1: Infrastructure (Completed) ✅**
-- Deployment of VPC network and Cloud NAT.
-- Terraform modules for GCS, BigQuery, and Dataproc.
-- Automation scripts:
-    - `init.sh`: Full project bootstrap (includes automatic API enablement).
-    - `sync-project.sh`: Bulk synchronization of identifiers (Project ID, Region, Buckets) across the configuration.
-    - `audit.sh`: Quick report of active resources.
-    - `costs.sh`: Monthly cost estimation.
-- Management VM configuration with static IP.
-
-### **Phase 2: Simulation Engine (In Progress) 🛠️**
-- Implementation of the **RK4 (Runge-Kutta 4th Order)** integrator.
-- Transformation of Boyer-Lindquist coordinate components to Cartesian.
-- Workload distribution using **PySpark** on Dataproc.
-
-### **Phase 3: Data Pipeline**
-- Simulation result ingestion into BigQuery.
-- Schema optimization for fast light particle queries.
-
-### **Phase 4: Visualization and Interface**
-- Interactive Dashboard development in React.
-- Simplified client-side ray-tracing implementation based on BigQuery data.
-
-### **Phase 5: Optimization and Launch**
-- Stress tests with millions of photons.
-- Final cleanup for Open Source publication.
-
----
-
-## 🚀 Quickstart Guide
-
-### 1. Initialization (Bootstrap)
-Prepare the GCP project, create the state bucket, and the administrative service account:
-```bash
-bash terraform/scripts/init.sh [PROJECT_ID] [STATE_BUCKET] [REGION] [USER_EMAIL]
-```
-
-### 2. Identifier Synchronization
-If you need to change project or region in the future, use the synchronization script:
-```bash
-bash terraform/scripts/sync-project.sh [PROJECT_ID] [STATE_BUCKET] [REGION] [USER_EMAIL]
-```
-
-### 3. Infrastructure Deployment
-Consult the detailed instructions in the Terraform folder for module deployment:
-👉 [**Infrastructure Instructions (Terraform)**](./terraform/README.md)
-
----
-
-## 📁 Project Structure
+## 🏗️ End-to-End Architecture
 
 ```text
-.
-├── terraform/          # Infrastructure as Code (GCP)
-│   ├── environments/   # Dev/Prod configurations
-│   ├── modules/        # Reusable GCS, BigQuery, Dataproc modules
-│   └── scripts/        # Terraform-specific automation
-├── src/
-│   ├── engine/         # PySpark RK4 Physics Engine
-│   ├── app/            # React Visualization Frontend
-│   └── api/            # FastAPI Data Bridge
-├── notebooks/          # Research & Math Validation
-├── docs/               # Architecture & Physics Documentation
-├── scripts/            # Global Project Utilities
-└── README.md           # This file
+    [ DISK OF ACCRETION ]         [ DISTRIBUTED CLUSTER ]        [ DATA WAREHOUSE ]
+    Interactive Dashboard  <--->      FastAPI Bridge      <--->     BigQuery
+      (React/Three.js)            (High-speed JSON)           (Partitioned/Clustered)
+             ^                                                        ^
+             |                                                        | Spark-BQ
+             +----------------------- [ GCS STORAGE ] <---------------+ Ingestion
+                                     (Parquet Output)
 ```
 
-## 🛠 Technologies
+---
 
-- **Infrastructure**: Terraform, Google Cloud Platform (GCS, BigQuery, Dataproc, Compute Engine).
-- **Physics Engine**: PySpark (Python), RK4 numerical integration.
-- **Frontend**: React, Three.js, WebGL.
-- **Backend API**: FastAPI (Python).
+## 🛠️ Project Setup
+
+### 1. Infrastructure (Terraform)
+Provision the GCP resources (Dataproc, BigQuery, GCS, IAM).
+```bash
+cd terraform/environments/dev
+terraform init
+terraform apply
+```
+
+### 2. API Backend (FastAPI)
+Initialize the high-speed data bridge.
+```bash
+./scripts/api/dev.sh
+```
+
+### 3. Frontend Visualizer (React/Vite)
+Launch the 3D dashboard.
+```bash
+./scripts/frontend/dev.sh
+```
 
 ---
-*Exploring the event horizon with big data and automation.*
+
+## 🚀 Usage Flow (Step-by-Step)
+
+### Step A: Run Physics Simulation
+Launches the RK4 integrator on the Dataproc cluster to calculate 10,000 photon geodesics.
+```bash
+./scripts/data/run_simulation.sh dev
+```
+**Diagram:**
+```text
+[ Physics (integrator.py) ] -> [ Spark RDD/DataFrame ] -> [ GCS (Parquet) ]
+```
+
+### Step B: Ingest into BigQuery
+Transfers simulation results from GCS to the analytical warehouse.
+```bash
+./scripts/data/run_ingestion.sh dev overwrite
+```
+**Diagram:**
+```text
+[ GCS (Parquet) ] -> [ Spark-BQ Connector ] -> [ BigQuery (photon_paths) ]
+```
+
+### Step C: Explore in 3D
+Open [http://localhost:5173](http://localhost:5173), adjust the "RAY INTENSITY" slider, and click **Load Photons**.
+**Diagram:**
+```text
+[ BigQuery ] -> [ FastAPI (BQ Client) ] -> [ JSON ] -> [ Three.js Line (BufferGeometry) ]
+```
+
+---
+
+## 🛑 Project Shutdown & Cleanup
+
+To avoid unnecessary GCP costs, follow these steps in order:
+
+1.  **Stop Local Services:** `Ctrl+C` in API and Frontend terminals.
+2.  **Destroy Infrastructure:**
+    ```bash
+    cd terraform/environments/dev
+    terraform destroy
+    ```
+    *Note: Ensure `deletion_protection=false` is set in the BigQuery module if removing datasets.*
+3.  **Clean Local Venv/Node:**
+    ```bash
+    rm -rf venv/
+    rm -rf frontend/node_modules/
+    ```
+
+---
+
+## 🛠️ Component Breakdown (ASCII)
+
+### 1. Engine (Simulation)
+```text
++-------------------+      +-------------------+      +-------------------+
+|   simulation_job  | ---> |   integrator.py   | ---> |   GCS (Parquet)   |
+| (PySpark Wrapper) |      | (RK4 Core Math)   |      | (Radial/Angular)  |
++-------------------+      +-------------------+      +-------------------+
+```
+
+### 2. API Bridge (Backend)
+```text
++-------------------+      +-------------------+      +-------------------+
+|      FastAPI      | <--- |  BigQuery Service | <--- |     BigQuery      |
+| (main + routes)   |      | (SDK Auto-detect) |      | (Clustered Tables)|
++-------------------+      +-------------------+      +-------------------+
+```
+
+### 3. Visualizer (Frontend)
+```text
++-------------------+      +-------------------+      +-------------------+
+|      App.tsx      | ---> |  ThreeScene/R3F   | ---> |  GPU BufferGeom   |
+| (UI + State)      |      | (Event Horizon)   |      | (Photon Traces)   |
++-------------------+      +-------------------+      +-------------------+
+```
+
+🕶️✨ **Crafted with mathematical precision and cinematic aesthetics.** Noah. ✨🕶️
