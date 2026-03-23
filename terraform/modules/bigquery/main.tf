@@ -43,8 +43,18 @@ resource "google_bigquery_table" "photon_paths" {
   table_id   = "photon_paths"
   project    = var.project_id
 
-  # Dataproc-BQ connector will manage the schema automatically.
-  # We apply clustering for performance.
+  # Explicit schema is REQUIRED when using clustering in Terraform
+  schema = <<EOF
+[
+  {"name": "photon_id", "type": "INTEGER", "mode": "REQUIRED", "description": "Unique identifier for the photon"},
+  {"name": "step", "type": "INTEGER", "mode": "REQUIRED", "description": "Step index in the geodesic path"},
+  {"name": "r", "type": "FLOAT", "mode": "REQUIRED", "description": "Radial coordinate (Schwarzschild)"},
+  {"name": "theta", "type": "FLOAT", "mode": "REQUIRED", "description": "Polar angle coordinate"},
+  {"name": "phi", "type": "FLOAT", "mode": "REQUIRED", "description": "Azimuthal angle coordinate"}
+]
+EOF
+
+  # We apply clustering for high-performance visual path queries.
   clustering = ["photon_id", "step"]
 
   labels = {
