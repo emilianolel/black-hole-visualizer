@@ -14,6 +14,6 @@ output "region" {
 }
 
 output "vm_external_ip" {
-  description = "IP externa de la instancia de Compute Engine (PROD)"
-  value       = module.compute.external_ip
+  value       = module.compute.static_ip
+  description = "Public static IP of the Ubuntu VM"
 }
