@@ -7,7 +7,7 @@
 terraform {
   backend "gcs" {
     # Reemplaza con el nombre real de tu bucket de estado
-    bucket = "my-tf-state-dnqxxt-bucket"
+    bucket = "bh-tf-state-dnqxxt-bucket"
     prefix = "terraform/global"
   }
 
@@ -36,11 +36,11 @@ provider "google" {
   region  = var.region
 
   # Descomenta y reemplaza con el email de la SA una vez creada con bootstrap:
-  impersonate_service_account = "terraform-admin@new-dez-project.iam.gserviceaccount.com"
+  impersonate_service_account = "bh-vis-admin@black-hole-visualizer-project.iam.gserviceaccount.com"
 }
 
 provider "google-beta" {
   project                     = var.project_id
   region                      = var.region
-  impersonate_service_account = "terraform-admin@new-dez-project.iam.gserviceaccount.com"
+  impersonate_service_account = "bh-vis-admin@black-hole-visualizer-project.iam.gserviceaccount.com"
 }
