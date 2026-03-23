@@ -5,7 +5,8 @@ from typing import List, Dict, Any
 class BigQueryService:
     def __init__(self):
         self.client = bigquery.Client()
-        self.project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+        # Use explicit env var OR auto-detected project from client
+        self.project_id = os.getenv("GOOGLE_CLOUD_PROJECT") or self.client.project
         self.dataset_id = "black_hole_sims"
         self.table_id = "photon_paths"
 
