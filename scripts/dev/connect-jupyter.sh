@@ -17,15 +17,24 @@ usage() {
 }
 
 stop_tunnel() {
+    # 1. Try stopping by PID file
     if [ -f "$PID_FILE" ]; then
         PID=$(cat "$PID_FILE")
-        echo "Stopping SSH tunnel (PID: $PID)..."
-        kill "$PID" 2>/dev/null
+        if ps -p "$PID" > /dev/null; then
+            echo "Stopping SSH tunnel (PID: $PID)..."
+            kill "$PID" 2>/dev/null
+        fi
         rm "$PID_FILE"
-        echo "Tunnel stopped."
-    else
-        echo "No active tunnel found (PID file missing)."
     fi
+
+    # 2. Safety check: ensure no residual process is listening on the port
+    RESIDUAL_PID=$(lsof -t -i :$LOCAL_PORT 2>/dev/null)
+    if [ ! -z "$RESIDUAL_PID" ]; then
+        echo "Cleaning up residual process on port $LOCAL_PORT (PID: $RESIDUAL_PID)..."
+        kill -9 "$RESIDUAL_PID" 2>/dev/null
+    fi
+
+    echo "✅ Tunnel stopped and port $LOCAL_PORT is free."
     exit 0
 }
 
