@@ -23,6 +23,7 @@ variable "gcp_service_apis" {
     "serviceusage.googleapis.com",
     "cloudbilling.googleapis.com",
     "billingbudgets.googleapis.com",
+    "iap.googleapis.com",
   ]
 }
 
