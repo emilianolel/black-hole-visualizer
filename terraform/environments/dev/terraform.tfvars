@@ -1,0 +1,7 @@
+subnet_cidr         = "10.0.0.0/24"
+pods_cidr           = "10.1.0.0/21"
+services_cidr       = "10.2.0.0/24"
+project_id         = "new-dez-project"
+region             = "us-central1"
+env                = "dev"
+terraform_admin_sa = "terraform-admin@new-dez-project.iam.gserviceaccount.com"

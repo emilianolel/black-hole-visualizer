@@ -1,0 +1,7 @@
+project_id = "TU_PROYECTO_ID"
+region     = "us-central1"
+
+# Lista de emails que podran ejecutar Terraform mediante impersonacion
+terraform_operators = [
+  "user:TU_EMAIL@gmail.com",
+]
