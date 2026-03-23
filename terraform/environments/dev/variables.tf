@@ -21,7 +21,7 @@ variable "services_cidr" {
 variable "region" {
   description = "Región principal de GCP"
   type        = string
-  default     = "us-central1"
+  default     = "northamerica-northeast2"
 }
 
 variable "env" {
