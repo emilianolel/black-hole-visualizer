@@ -2,22 +2,38 @@
 
 This directory contains research and validation notebooks that run locally but execute on the **GCP Dataproc Cluster**.
 
-## 🏗️ Connection Architecture
-
-The connection works via a secure SSH tunnel. Your local machine acts as a bridge to the remote Spark kernel.
+## 🏗️ Connection & Execution Architecture
 
 ```text
-       LOCAL MACHINE (PC)                           GOOGLE CLOUD (GCP)
-    +-------------------------+               +----------------------------------+
-    |  Directorio:            |               |  Dataproc Cluster (Master Node)  |
-    |  /notebooks/*.ipynb     |               |                                  |
-    |                         |               |  +----------------------------+  |
-    |  [ Local Port 8888 ]    | <== SSH ==>   |  | Jupyter Container (8123)  |  |
-    |           ^             |    Tunnel     |  |      (Remote Kernel)       |  |
-    +-----------|-------------+   (Port 22)   |  +----------------------------+  |
-                |                             |                |                 |
-        (Connect to Remote                    |        [ Spark / YARN / BQ ]     |
-         Jupyter Server)                      +----------------------------------+
+    [ LOCAL WORKSTATION ]                   [ GOOGLE CLOUD PLATFORM (GCP) ]
+   +-----------------------+               +-------------------------------------+
+   |  VS Code / Jupyter    |               |       Dataproc Compute Cluster      |
+   |  (Frontend Interface) |               |                                     |
+   +-----------+-----------+               |   +-----------------------------+   |
+               |                           |   |      MASTER NODE (VM)       |   |
+               v                           |   |                             |   |
+   +-----------+-----------+               |   |  +-----------------------+  |   |
+   | Local Port 8888       | <==[ SSH ]====|==>|  | Jupyter Gateway (8123)|  |   |
+   +-----------+-----------+      Tunnel   |   |  +-----------+-----------+  |   |
+               ^             (via IAP)     |   |              |              |   |
+               |                           |   |              v              |   |
+               |                           |   |  +-----------------------+  |   |
+      (Kernel Requests)                    |   |  |  Spark Driver Kernel  |  |   |
+               |                           |   |  +-----------+-----------+  |   |
+               |                           |   +--------------|--------------+   |
+               |                           |                  |                  |
+               |                           |        (Distributed Tasks)          |
+               |                           |                  v                  |
+               |                           |   +--------------+--------------+   |
+               |                           |   |      WORKER NODES (n)       |   |
+               |                           |   +--------------+--------------+   |
+               |                           |                  |                  |
+               +---------------------------|------------------+                  |
+                                           |                  v                  |
+                                           |   +--------------+--------------+   |
+                                           |   |   GCS/BigQuery Data Lake    |   |
+                                           |   +-----------------------------+   |
+                                           +-------------------------------------+
 ```
 
 ## 🚀 How to Connect
