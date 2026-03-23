@@ -88,7 +88,14 @@ fi
 gcloud compute os-login ssh-keys add --key-file="$HOME/.ssh/google_compute_engine.pub" --ttl=1d --quiet 2>/dev/null
 echo "Keys synchronized."
 
-# 3. Start SSH Tunnel
+# 3. Synchronize Physics Engine (Integrator)
+# We ensure the remote master node has access to our local physics logic 
+# so notebooks can import it without errors.
+echo "Synchronizing physics engine to remote master..."
+gcloud compute scp "src/engine/integrator.py" "${MASTER_NODE}:" --project "$PROJECT_ID" --quiet 2>/dev/null
+echo "Engine logic synchronized."
+
+# 4. Start SSH Tunnel
 echo "Establishing SSH tunnel on port $LOCAL_PORT..."
 gcloud compute ssh "$MASTER_NODE" --project "$PROJECT_ID" --tunnel-through-iap -- -L "$LOCAL_PORT:localhost:$REMOTE_PORT" -N -f
 echo $! > "$PID_FILE"
