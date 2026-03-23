@@ -1,7 +1,47 @@
-# Notebooks
+# 📓 Remote Jupyter Notebooks
 
-Jupyter notebooks for exploratory research, mathematical validation, and data visualization.
+This directory contains research and validation notebooks that run locally but execute on the **GCP Dataproc Cluster**.
 
-## Contents
-- **Math Verifications**: Validating the Schwarzschild metric and RK4 implementation.
-- **EDA**: Exploratory Data Analysis of simulation outputs.
+## 🏗️ Connection Architecture
+
+The connection works via a secure SSH tunnel. Your local machine acts as a bridge to the remote Spark kernel.
+
+```text
+       LOCAL MACHINE (PC)                           GOOGLE CLOUD (GCP)
+    +-------------------------+               +----------------------------------+
+    |  Directorio:            |               |  Dataproc Cluster (Master Node)  |
+    |  /notebooks/*.ipynb     |               |                                  |
+    |                         |               |  +----------------------------+  |
+    |  [ Local Port 8888 ]    | <== SSH ==>   |  | Jupyter Container (8123)  |  |
+    |           ^             |    Tunnel     |  |      (Remote Kernel)       |  |
+    +-----------|-------------+   (Port 22)   |  +----------------------------+  |
+                |                             |                |                 |
+        (Connect to Remote                    |        [ Spark / YARN / BQ ]     |
+         Jupyter Server)                      +----------------------------------+
+```
+
+## 🚀 How to Connect
+
+1.  **Authorize GCP**: Ensure you have logged in with `gcloud auth login`.
+2.  **Start the Tunnel**: Run the automation script from the project root:
+    ```bash
+    chmod +x scripts/dev/connect-jupyter.sh
+    ./scripts/dev/connect-jupyter.sh dev
+    ```
+3.  **Copy the URL**: The script will print a URL containing a `token`, for example:
+    `http://localhost:8888/?token=abcdef123...`
+
+## 💻 Integration with VS Code
+
+1.  Open any `.ipynb` file in this directory.
+2.  Click on **"Select Kernel"** (top right).
+3.  Select **"Existing Jupyter Server"**.
+4.  Paste the URL provided by the script.
+5.  Select the **PySpark** kernel from the list.
+
+## 🛑 Stop the Session
+
+To close the tunnel and free up your local port, run:
+```bash
+./scripts/dev/connect-jupyter.sh --stop
+```
