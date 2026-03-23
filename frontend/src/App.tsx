@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars, Bloom, EffectComposer } from '@react-three/drei';
+import { OrbitControls, Stars } from '@react-three/drei';
 import { EventHorizon } from './components/EventHorizon';
 import { PhotonPath } from './components/PhotonPath';
 import { RefreshCw, Zap } from 'lucide-react';
@@ -12,11 +12,12 @@ function App() {
   const [photons, setPhotons] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({ count: 0 });
+  const [limit, setLimit] = useState(40);
 
   const fetchSample = async () => {
     setLoading(true);
     try {
-      const resp = await fetch(`${API_BASE}/v1/photons/sample/batch?limit=40`);
+      const resp = await fetch(`${API_BASE}/v1/photons/sample/batch?limit=${limit}`);
       const data = await resp.json();
       setPhotons(data.photons);
       setStats({ count: data.count });
@@ -38,6 +39,22 @@ function App() {
         <h1 className="title">Schwarzschild</h1>
         <p className="subtitle">Visualizer v1.0</p>
         
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ fontSize: '0.7rem', color: '#888', display: 'block', marginBottom: '0.4rem' }}>
+            RAY INTENSITY (LIMIT)
+          </label>
+          <input 
+            type="range" 
+            min="10" 
+            max="1000" 
+            step="10"
+            value={limit}
+            onChange={(e) => setLimit(parseInt(e.target.value))}
+            style={{ width: '100%', marginBottom: '0.5rem' }}
+          />
+          <div style={{ fontSize: '0.8rem', textAlign: 'right', color: '#aaa' }}>{limit} Photons</div>
+        </div>
+
         <button onClick={fetchSample} disabled={loading}>
           {loading ? (
             <RefreshCw className="animate-spin" size={16} />
