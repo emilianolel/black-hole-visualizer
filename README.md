@@ -114,4 +114,13 @@ To avoid unnecessary GCP costs, follow these steps in order:
 +-------------------+      +-------------------+      +-------------------+
 ```
 
+### 4. Unified App Manager (scripts/manage.sh)
+```text
+[ manage.sh ]
+├── start   --> [ uvicorn (API) ] + [ vite (FE) ] + write *.pid
+├── stop    --> read *.pid + kill processes + rm *.pid
+├── restart --> stop + sleep + start
+└── status  --> check ps for *.pids
+```
+
 🕶️✨ **Crafted with mathematical precision and cinematic aesthetics.** Noah. ✨🕶️
