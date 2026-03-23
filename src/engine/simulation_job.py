@@ -12,69 +12,73 @@ except ImportError:
 
 def run_simulation(partition_id, iterator):
     """
-    Worker-side function to process a batch of photons.
+    Worker-side generator. Accessing row by attribute for performance.
     """
-    results = []
     for row in iterator:
-        photon_id = row['photon_id']
-        # Initial state: [t, r, theta, phi, pt, pr, ptheta, pphi]
+        photon_id = row.photon_id
         initial_state = np.array([
-            row['t0'], row['r0'], row['theta0'], row['phi0'],
-            row['pt0'], row['pr0'], row['ptheta0'], row['pphi0']
+            row.t0, row.r0, row.theta0, row.phi0,
+            row.pt0, row.pr0, row.ptheta0, row.pphi0
         ])
         
-        # Perform the trace
         path = integrator.trace_photon(initial_state, step_size=0.1, max_steps=500)
         
-        # Flatten the path for storage [step_index, r, theta, phi]
-        # We only store spatial coordinates to save space
         for i, state in enumerate(path):
-            results.append((photon_id, i, float(state[1]), float(state[2]), float(state[3])))
-            
-    return iter(results)
+            yield (int(photon_id), int(i), float(state[1]), float(state[2]), float(state[3]))
 
-def generate_initial_conditions(photon_id, num_photons=100000):
+def generate_initial_conditions(photon_id, num_photons):
     """
-    Worker-side function to generate initial conditions for a single photon.
-    This prevents memory pressure on the driver node.
+    Worker-side function to generate initial conditions.
     """
-    phi = (2 * np.pi * photon_id) / num_photons
-    return {
-        "photon_id": int(photon_id),
-        "t0": 0.0, "r0": 20.0, "theta0": np.pi/2, "phi0": float(phi),
-        "pt0": -1.0, "pr0": -0.5, "ptheta0": 0.0, "pphi0": 4.4
-    }
+    phi = (2 * np.pi * float(photon_id)) / num_photons
+    return (int(photon_id), 0.0, 20.0, float(np.pi/2), float(phi), -1.0, -0.5, 0.0, 4.4)
 
 def main():
     spark = SparkSession.builder \
-        .appName("BlackHole-RayTracer-Phase2-Pro") \
+        .appName("BlackHole-RayTracer-Phase2-Production") \
         .getOrCreate()
+    
+    # 1. Define Explicit Schemas (Crucial for stability)
+    ic_schema = StructType([
+        StructField("photon_id", IntegerType(), False),
+        StructField("t0", DoubleType(), False),
+        StructField("r0", DoubleType(), False),
+        StructField("theta0", DoubleType(), False),
+        StructField("phi0", DoubleType(), False),
+        StructField("pt0", DoubleType(), False),
+        StructField("pr0", DoubleType(), False),
+        StructField("ptheta0", DoubleType(), False),
+        StructField("pphi0", DoubleType(), False)
+    ])
 
-    # 1. Distributed Generation of Initial Conditions
-    # We start with a range of IDs and generate ICs on the workers.
-    # Increasing to 100,000 photons to demonstrate "Pro" scalability.
-    num_photons = 100000 
-    df_ic = spark.range(num_photons).rdd.map(lambda x: generate_initial_conditions(x, num_photons)).toDF()
-    
-    # 2. Process partition-wise for efficiency
-    rdd_results = df_ic.rdd.mapPartitionsWithIndex(run_simulation)
-    
-    # 4. Define Output Schema
-    schema = StructType([
+    result_schema = StructType([
         StructField("photon_id", IntegerType(), False),
         StructField("step", IntegerType(), False),
         StructField("r", DoubleType(), False),
         StructField("theta", DoubleType(), False),
         StructField("phi", DoubleType(), False)
     ])
+
+    # 2. Distributed Generation 
+    num_photons = 100000 
     
-    # 5. Save results to GCS (Path from project metadata)
-    output_path = "gs://black-hole-visualizer-project-bh-vis-dataproc-config/sim_results/phase2_test"
+    rdd_ic = spark.range(num_photons).repartition(200).rdd \
+        .map(lambda x: generate_initial_conditions(x.id, num_photons))
     
-    df_results = spark.createDataFrame(rdd_results, schema)
+    df_ic = spark.createDataFrame(rdd_ic, ic_schema)
+    
+    # 3. Distributed Integration
+    print("Launching relativistic ray-tracing across executors...")
+    rdd_results = df_ic.rdd.mapPartitionsWithIndex(run_simulation)
+    
+    # 4. Save to GCS
+    output_path = "gs://black-hole-visualizer-project-bh-vis-dataproc-config/sim_results/phase2_pro"
+    print(f"Tracking results and writing to {output_path}...")
+    
+    df_results = spark.createDataFrame(rdd_results, result_schema)
     df_results.write.mode("overwrite").parquet(output_path)
     
-    print(f"--- Simulation Complete! Results saved to {output_path} ---")
+    print(f"🏁 Simulation Successful! Results saved to {output_path}")
 
 if __name__ == "__main__":
     main()
