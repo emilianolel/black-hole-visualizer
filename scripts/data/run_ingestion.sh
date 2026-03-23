@@ -26,15 +26,14 @@ gcloud storage cp "src/engine/ingestion_job.py" "gs://${CONFIG_BUCKET}/deploy/sr
 echo "Sync Complete."
 
 # 2. Submit PySpark Job with BigQuery Connector
-# We use the official spark-bigquery-with-dependencies package.
+# We use the spark.jars.packages property to download the official Spark-BigQuery connector.
 # We also set the temporaryGcsBucket required for indirect writes.
 echo "Launching ingestion job..."
 gcloud dataproc jobs submit pyspark \
     "gs://${CONFIG_BUCKET}/deploy/src/engine/ingestion_job.py" \
     --cluster="$CLUSTER_NAME" \
     --region="$REGION" \
-    --properties="spark.datasource.bigquery.temporaryGcsBucket=${TEMP_BUCKET}" \
-    --packages="com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.29.0" \
+    --properties="spark.datasource.bigquery.temporaryGcsBucket=${TEMP_BUCKET},spark.jars.packages=com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.29.0" \
     -- \
     --source="$SOURCE_PATH" \
     --mode="$MODE"
