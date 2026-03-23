@@ -20,8 +20,9 @@ gcloud storage cp "src/engine/simulation_job.py" "gs://${BUCKET_NAME}/deploy/src
 echo "Sync Complete."
 
 # 2. Submit PySpark Job
-# We include integrator.py as a py-file so Spark can distribute it to executors.
-# We increase memory properties to avoid SIGKILL (memory pressure) errors.
+TEMP_BUCKET="black-hole-visualizer-project-bh-vis-dataproc-temp"
+OUTPUT_PATH="gs://${TEMP_BUCKET}/simulations/output/parquet"
+
 echo "Launching distributed Spark job..."
 gcloud dataproc jobs submit pyspark \
     "gs://${BUCKET_NAME}/deploy/src/engine/simulation_job.py" \
@@ -29,8 +30,9 @@ gcloud dataproc jobs submit pyspark \
     --region="$REGION" \
     --project="$PROJECT_ID" \
     --py-files="gs://${BUCKET_NAME}/deploy/src/engine/integrator.py" \
-    --jars="gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar" \
-    --properties="spark.driver.memory=1g,spark.executor.memory=1g,spark.executor.memoryOverhead=512m,spark.sql.execution.arrow.pyspark.enabled=true"
+    --properties="spark.driver.memory=4g,spark.executor.memory=4g,spark.driver.maxResultSize=2g,spark.sql.execution.arrow.pyspark.enabled=true,spark.driver.memoryOverhead=1024,spark.executor.memoryOverhead=1024" \
+    -- \
+    --output="$OUTPUT_PATH"
 
 echo "----------------------------------------------------"
 echo "✅ Job submitted! Monitor progress in the GCP Console."
