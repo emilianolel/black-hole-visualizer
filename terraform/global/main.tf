@@ -22,6 +22,9 @@ data "google_project" "project" {
   project_id = local.project_id
 }
 
+# NOTE: Cloud Composer 2 IAM members are currently disabled as they are not 
+# required for the core Dataproc architecture.
+
 ###############################################################################
 # Terraform Administration Service Account
 # This SA replaces the use of personal accounts for managing infrastructure.

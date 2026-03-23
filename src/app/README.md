@@ -1,8 +1,9 @@
-# Visualization App
+# 🎨 Visualization App
 
-React-based frontend for interactive exploration of black hole simulations.
+A high-performance **React** frontend designed for interactive exploration of black hole simulations.
 
-## Tech Stack
-- **React**: UI library.
-- **Three.js / WebGL**: High-performance 3D rendering of the accretion disk and photon spheres.
-- **TailwindCSS**: Modern styling.
+## 🛠️ Tech Stack
+-   **React**: Modern UI architecture.
+-   **Three.js / WebGL**: Blazing fast 3D rendering of accretion disks and photon spheres. 🌌
+-   **TailwindCSS**: Elegant, utility-first styling.
+-   **Vite**: Lightning-fast development and build pipeline. ⚡

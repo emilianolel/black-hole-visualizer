@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 ###############################################################################
-# install_requirements.sh — Instalador automático de dependencias (Terraform/gcloud)
-# Soporta: macOS (Homebrew) y Linux (APT)
+# install_requirements.sh — Automatic dependency installer (Terraform/gcloud)
+# Supports: macOS (Homebrew) and Linux (APT)
 ###############################################################################
 
 set -euo pipefail
 
-echo "🛠️  Verificando requerimientos del sistema..."
+echo "🛠️  Verifying system requirements..."
 echo "----------------------------------------------------------"
 
 # Detector de Sistema Operativo
@@ -15,13 +15,13 @@ case "${OS_TYPE}" in
 Darwin*) OS="mac" ;;
 Linux*) OS="linux" ;;
 *)
-    echo "❌ OS no soportado automáticamente. Por favor instala Terraform y gcloud manualmente."
+    echo "❌ OS not automatically supported. Please install Terraform and gcloud manually."
     exit 1
     ;;
 esac
 
 install_terraform() {
-    echo "🏗️  Instalando Terraform..."
+    echo "🏗️  Installing Terraform..."
     if [[ "$OS" == "mac" ]]; then
         brew tap hashicorp/tap
         brew install hashicorp/tap/terraform
@@ -34,7 +34,7 @@ install_terraform() {
 }
 
 install_gcloud() {
-    echo "☁️  Instalando Google Cloud SDK..."
+    echo "☁️  Installing Google Cloud SDK..."
     if [[ "$OS" == "mac" ]]; then
         brew install --cask google-cloud-sdk
     else
@@ -46,20 +46,20 @@ install_gcloud() {
 
 # 1. Verificar Terraform
 if ! command -v terraform &>/dev/null; then
-    echo "⚠️  Terraform NO encontrado."
+    echo "⚠️  Terraform NOT found."
     install_terraform
 else
-    echo "✅ Terraform ya instalado: $(terraform version | head -n 1)"
+    echo "✅ Terraform already installed: $(terraform version | head -n 1)"
 fi
 
 # 2. Verificar gcloud
 if ! command -v gcloud &>/dev/null; then
-    echo "⚠️  gcloud SDK NO encontrado."
+    echo "⚠️  gcloud SDK NOT found."
     install_gcloud
 else
-    echo "✅ gcloud SDK ya instalado: $(gcloud --version | head -n 1)"
+    echo "✅ gcloud SDK already installed: $(gcloud --version | head -n 1)"
 fi
 
 echo "----------------------------------------------------------"
-echo "🎉 ¡Todo listo! Verifica tu instalación con 'terraform -version' y 'gcloud --version'."
-echo "💡 No olvides ejecutar 'gcloud auth login' después de la instalación."
+echo "🎉 All set! Verify your installation with 'terraform -version' and 'gcloud --version'."
+echo "💡 Don't forget to run 'gcloud auth login' after installation."

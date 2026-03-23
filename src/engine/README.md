@@ -1,8 +1,9 @@
-# Physics Engine
+# ⚙️ Physics Engine
 
-This directory contains the core simulation logic for the Black Hole Visualizer.
+The core computational heart of the **Black Hole Visualizer**, responsible for high-precision ray-tracing in curved spacetime.
 
-## Components
-- **RK4 Integrator**: Numerical method to solve the geodesic equations.
-- **Schwarzschild Metric**: Mathematical description of the spacetime geometry.
-- **PySpark Jobs**: Distributed processing for massive ray-tracing simulations.
+## 🧪 Components
+-   **RK4 Integrator**: 4th-order Runge-Kutta numerical method for solving geodesic equations. 📐
+-   **Schwarzschild Metric**: Relativistic mathematical framework for spherical, non-rotating black holes.
+-   **PySpark Jobs**: Massively parallel processing across Dataproc clusters. ⚡
+-   **GCS Integration**: Scalable data storage for simulation checkpoints and raw results. ☁️

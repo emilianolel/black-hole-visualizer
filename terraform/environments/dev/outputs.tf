@@ -1,15 +1,15 @@
 output "project_id" {
-  description = "ID del proyecto desplegado"
+  description = "Deployed Project ID"
   value       = var.project_id
 }
 
 output "environment" {
-  description = "Entorno activo"
+  description = "Active environment"
   value       = var.env
 }
 
 output "region" {
-  description = "Región desplegada"
+  description = "Deployed region"
   value       = var.region
 }
 
