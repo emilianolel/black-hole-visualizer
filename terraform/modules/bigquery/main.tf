@@ -44,7 +44,7 @@ resource "google_bigquery_table" "photon_paths" {
   project    = var.project_id
   deletion_protection = false
 
-  /* Temporarily commented to disable protection in state first
+  # Explicit schema is REQUIRED when using clustering in Terraform
   schema = <<EOF
 [
   {"name": "photon_id", "type": "INTEGER", "mode": "REQUIRED", "description": "Unique identifier for the photon"},
@@ -55,17 +55,18 @@ resource "google_bigquery_table" "photon_paths" {
 ]
 EOF
 
+  # Range Partitioning by photon_id for massive scalability and cost control.
   range_partitioning {
     field = "photon_id"
     range {
       start    = 0
-      end      = 100000000
-      interval = 10000
+      end      = 100000000 # Supporting up to 100M photons
+      interval = 10000     # Groups of 10k photons per partition
     }
   }
 
+  # We apply clustering for high-performance visual path queries within partitions.
   clustering = ["photon_id", "step"]
-  */
 
   labels = {
     env     = var.env
