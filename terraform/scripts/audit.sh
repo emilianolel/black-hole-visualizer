@@ -27,7 +27,7 @@ gcloud compute instances list --project="${PROJECT_ID}" --format="table(name, zo
 echo ""
 
 echo "🤖 Dataproc (Clusters):"
-gcloud dataproc clusters list --project="${PROJECT_ID}" --region=us-central1 --format="table(clusterName, status.state, config.masterConfig.machineType)" 2>/dev/null || echo "   - Ninguno (us-central1)"
+gcloud dataproc clusters list --project="${PROJECT_ID}" --region=northamerica-northeast2 --format="table(clusterName, status.state, config.masterConfig.machineType)" 2>/dev/null || echo "   - Ninguno (northamerica-northeast2)"
 echo ""
 
 echo "🌐 Networking (VPCs):"
