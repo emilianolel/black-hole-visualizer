@@ -31,10 +31,10 @@ status() {
 }
 
 start() {
-    # 1. Ensure Backend Environment
-    if [ ! -d "venv" ]; then
-        echo "🐍 Creating Python virtual environment..."
-        python3 -m venv venv
+    # 1. Ensure Backend Environment (Binary Check)
+    if [ ! -f "venv/bin/uvicorn" ]; then
+        echo "🐍 Python environment incomplete. Installing dependencies..."
+        python3 -m venv venv --clear
         source venv/bin/activate
         pip install --upgrade pip
         pip install -r src/api/requirements.txt
@@ -46,16 +46,16 @@ start() {
     if [ ! -f "$API_PID" ]; then
         echo "🚀 Starting Backend API..."
         export PYTHONPATH=$PYTHONPATH:.
-        uvicorn src.api.main:app --host 0.0.0.0 --port 8000 > scripts/api.log 2>&1 &
+        ./venv/bin/uvicorn src.api.main:app --host 0.0.0.0 --port 8000 > scripts/api.log 2>&1 &
         echo $! > "$API_PID"
         echo "✅ Backend launched (Log: scripts/api.log)"
     else
         echo "⚠️  Backend already running."
     fi
 
-    # 2. Ensure Frontend Environment
-    if [ ! -d "frontend/node_modules" ]; then
-        echo "📦 Installing Frontend dependencies (NPM)..."
+    # 2. Ensure Frontend Environment (Binary Check)
+    if [ ! -f "frontend/node_modules/.bin/vite" ]; then
+        echo "📦 Node environment incomplete. Installing dependencies..."
         cd frontend || exit
         npm install
         cd ..
