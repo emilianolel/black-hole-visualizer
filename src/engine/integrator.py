@@ -45,11 +45,12 @@ def derivatives(state: np.ndarray, lambda_prop: float) -> np.ndarray:
     dpt_dlam = 0.0  # t is cyclic
     dpphi_dlam = 0.0  # phi is cyclic
     
-    # Radial momentum derivative: derived from Christoffel symbols or Hamiltonian grad
-    dpr_dlam = (-(RS / (2 * r**2 * one_minus_rs_r)) * pt**2 + 
-                (RS / (2 * r**2 * one_minus_rs_r)) * pr**2 + 
+    # Radial momentum derivative: derived from Hamiltonian grad:
+    # dot(p_r) = - dH/dr = - M*p_t^2/(A^2 * r^2) - M*p_r^2/r^2 + L^2/r^3
+    dpr_dlam = (-(M / (r**2 * one_minus_rs_r**2)) * pt**2 - 
+                (M / r**2) * pr**2 + 
                 (ptheta**2 / r**3) + 
-                (pphi**2 / (r**3 * np.sin(theta)**2)))
+                (pphi**2 / (r**3 * np.sin(theta)**2 + 1e-15)))
     
     # Theta momentum derivative
     dptheta_dlam = (pphi**2 * np.cos(theta)) / (r**2 * np.sin(theta)**3 + 1e-15)
