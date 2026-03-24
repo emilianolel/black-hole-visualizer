@@ -11,6 +11,8 @@ readonly REGION="northamerica-northeast2"
 readonly CLUSTER_ENV="${1:-dev}"
 readonly CLUSTER_NAME="${CLUSTER_ENV}-dataproc-cluster"
 
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 readonly CONFIG_BUCKET="black-hole-visualizer-project-bh-vis-dataproc-config"
 readonly TEMP_BUCKET="black-hole-visualizer-project-bh-vis-dataproc-temp"
 readonly OUTPUT_PATH="gs://${TEMP_BUCKET}/simulations/output/parquet"

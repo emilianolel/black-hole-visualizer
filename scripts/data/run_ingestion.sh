@@ -12,6 +12,9 @@ readonly CLUSTER_ENV="${1:-dev}"
 readonly INGEST_MODE="${2:-append}"
 readonly CLUSTER_NAME="${CLUSTER_ENV}-dataproc-cluster"
 
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
 # Specific Buckets from Terraform
 readonly CONFIG_BUCKET="black-hole-visualizer-project-bh-vis-dataproc-config"
 readonly TEMP_BUCKET="black-hole-visualizer-project-bh-vis-dataproc-temp"
