@@ -99,13 +99,15 @@ def trace_photon(
     current_state = initial_state
     
     for _ in range(max_steps):
+        current_state = rk4_step(current_state, step_size)
+        
         # Termination and Clipping Logic (Safety buffer at RS)
         if current_state[1] <= RS + 1e-3:
             current_state[1] = RS + 1.1e-3  # Snap slightly outside for clean visuals
-            path.append(current_state)
+            path.append(current_state.copy())
             break
             
-        path.append(current_state)
+        path.append(current_state.copy())
         
         if current_state[1] > 100.0 * M:  # Escaped to 'Infinity' (numerical boundary)
             break
