@@ -31,16 +31,34 @@ status() {
 }
 
 start() {
+    # 1. Ensure Backend Environment
+    if [ ! -d "venv" ]; then
+        echo "🐍 Creating Python virtual environment..."
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r src/api/requirements.txt
+    else
+        source venv/bin/activate
+    fi
+
     # 1. Start Backend
     if [ ! -f "$API_PID" ]; then
         echo "🚀 Starting Backend API..."
-        source venv/bin/activate
         export PYTHONPATH=$PYTHONPATH:.
         uvicorn src.api.main:app --host 0.0.0.0 --port 8000 > scripts/api.log 2>&1 &
         echo $! > "$API_PID"
         echo "✅ Backend launched (Log: scripts/api.log)"
     else
         echo "⚠️  Backend already running."
+    fi
+
+    # 2. Ensure Frontend Environment
+    if [ ! -d "frontend/node_modules" ]; then
+        echo "📦 Installing Frontend dependencies (NPM)..."
+        cd frontend || exit
+        npm install
+        cd ..
     fi
 
     # 2. Start Frontend
