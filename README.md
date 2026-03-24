@@ -71,20 +71,16 @@ Run `./scripts/manage.sh start`, open [http://localhost:5173](http://localhost:5
 
 ## 🛑 Project Shutdown & Cleanup
 
-To avoid unnecessary GCP costs, follow these steps in order:
+To gracefully shut down all services and clean your environment:
 
-1.  **Stop Local Services:** `Ctrl+C` in API and Frontend terminals.
-2.  **Destroy Infrastructure:**
-    ```bash
-    cd terraform/environments/dev
-    terraform destroy
-    ```
-    *Note: Ensure `deletion_protection=false` is set in the BigQuery module if removing datasets.*
-3.  **Clean Local Venv/Node:**
-    ```bash
-    rm -rf venv/
-    rm -rf frontend/node_modules/
-    ```
+```bash
+./scripts/cleanup.sh
+```
+
+This automated tool will:
+1.  **Stop** the Backend API and Frontend Visualizer.
+2.  **Purge** temp files, logs, `venv`, and `node_modules`.
+3.  **Prompt** you if you want to run `terraform destroy` for the cloud resources.
 
 ---
 
