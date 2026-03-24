@@ -61,8 +61,28 @@ start() {
 
 stop() {
     echo "🛑 Stopping all services..."
-    [ -f "$API_PID" ] && kill $(cat "$API_PID") && rm "$API_PID" && echo "✅ Backend stopped."
-    [ -f "$FE_PID" ] && kill $(cat "$FE_PID") && rm "$FE_PID" && echo "✅ Frontend stopped."
+    
+    # 1. Kill Backend (PID + Port fallback)
+    if [ -f "$API_PID" ]; then
+        TARGET_PID=$(cat "$API_PID")
+        pkill -P "$TARGET_PID" 2>/dev/null
+        kill "$TARGET_PID" 2>/dev/null
+        rm "$API_PID"
+    fi
+    # Force clear port 8000
+    lsof -ti :8000 | xargs kill -9 2>/dev/null
+    echo "✅ Backend stopped."
+
+    # 2. Kill Frontend (PID + Port fallback)
+    if [ -f "$FE_PID" ]; then
+        TARGET_PID=$(cat "$FE_PID")
+        pkill -P "$TARGET_PID" 2>/dev/null
+        kill "$TARGET_PID" 2>/dev/null
+        rm "$FE_PID"
+    fi
+    # Force clear port 5173
+    lsof -ti :5173 | xargs kill -9 2>/dev/null
+    echo "✅ Frontend stopped."
 }
 
 case "$1" in
