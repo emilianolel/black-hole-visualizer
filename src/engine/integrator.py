@@ -75,11 +75,6 @@ def rk4_step(state: np.ndarray, h: float) -> np.ndarray:
     k4 = derivatives(state + h * k3, h)
     
     new_state = state + (h / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
-    
-    # Event Horizon Boundary Check: Prevent stepping inside RS significantly
-    if new_state[1] < RS + 1e-4:
-        new_state[1] = RS  # Snap precisely to the horizon
-        
     return new_state
 
 
@@ -105,8 +100,8 @@ def trace_photon(
         current_state = rk4_step(current_state, step_size)
         path.append(current_state)
         
-        # Termination conditions
-        if current_state[1] <= RS:  # Captured by Black Hole
+        # Termination conditions (Safety buffer to avoid coordinate singularity at RS)
+        if current_state[1] <= RS + 1e-3:  # Captured by Black Hole
             break
         if current_state[1] > 100.0 * M:  # Escaped to 'Infinity' (numerical boundary)
             break
