@@ -1,39 +1,48 @@
 #!/bin/bash
-# run_simulation.sh — Submits the ray-tracing physics job to Dataproc.
+# run_simulation.sh — Submits the ray-tracing physics job to Google Cloud Dataproc.
+#
+# Usage: ./scripts/data/run_simulation.sh [dev|prod]
 
-# Load Project Configuration
-PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
-REGION="northamerica-northeast2"
-ENV=${1:-dev}
-CLUSTER_NAME="${ENV}-dataproc-cluster"
+set -euo pipefail
 
-echo "----------------------------------------------------"
-echo "🚀 Submitting Black Hole Simulation (Phase 2)"
-echo "Cluster: $CLUSTER_NAME"
-echo "----------------------------------------------------"
+# --- Configuration ---
+readonly PROJECT_ID="$(gcloud config get-value project 2>/dev/null)"
+readonly REGION="northamerica-northeast2"
+readonly CLUSTER_ENV="${1:-dev}"
+readonly CLUSTER_NAME="${CLUSTER_ENV}-dataproc-cluster"
 
-# 1. Stage the files in GCS (Mirroring Standard)
-echo "Synchronizing engine code to GCS..."
-BUCKET_NAME="black-hole-visualizer-project-bh-vis-dataproc-config"
-gcloud storage cp "src/engine/integrator.py" "gs://${BUCKET_NAME}/deploy/src/engine/integrator.py" --quiet
-gcloud storage cp "src/engine/simulation_job.py" "gs://${BUCKET_NAME}/deploy/src/engine/simulation_job.py" --quiet
-echo "Sync Complete."
+readonly CONFIG_BUCKET="black-hole-visualizer-project-bh-vis-dataproc-config"
+readonly TEMP_BUCKET="black-hole-visualizer-project-bh-vis-dataproc-temp"
+readonly OUTPUT_PATH="gs://${TEMP_BUCKET}/simulations/output/parquet"
 
-# 2. Submit PySpark Job
-TEMP_BUCKET="black-hole-visualizer-project-bh-vis-dataproc-temp"
-OUTPUT_PATH="gs://${TEMP_BUCKET}/simulations/output/parquet"
+function sync_engine_code() {
+    echo "----------------------------------------------------"
+    echo "🚀 Synchronizing engine code to GCS..."
+    gcloud storage cp "src/engine/integrator.py" "gs://${CONFIG_BUCKET}/deploy/src/engine/integrator.py" --quiet
+    gcloud storage cp "src/engine/simulation_job.py" "gs://${CONFIG_BUCKET}/deploy/src/engine/simulation_job.py" --quiet
+    echo "✅ Sync Complete."
+}
 
-echo "Launching distributed Spark job..."
-gcloud dataproc jobs submit pyspark \
-    "gs://${BUCKET_NAME}/deploy/src/engine/simulation_job.py" \
-    --cluster="$CLUSTER_NAME" \
-    --region="$REGION" \
-    --project="$PROJECT_ID" \
-    --py-files="gs://${BUCKET_NAME}/deploy/src/engine/integrator.py" \
-    --properties="spark.driver.memory=4g,spark.executor.memory=4g,spark.driver.maxResultSize=2g,spark.sql.execution.arrow.pyspark.enabled=true,spark.driver.memoryOverhead=1024,spark.executor.memoryOverhead=1024" \
-    -- \
-    --output="$OUTPUT_PATH"
+function submit_pyspark_job() {
+    echo "----------------------------------------------------"
+    echo "📡 Launching distributed Spark job on: ${CLUSTER_NAME}"
+    echo "----------------------------------------------------"
 
-echo "----------------------------------------------------"
-echo "✅ Job submitted! Monitor progress in the GCP Console."
-echo "----------------------------------------------------"
+    # Submit job using optimized Spark configuration for large-scale ray-tracing
+    gcloud dataproc jobs submit pyspark \
+        "gs://${CONFIG_BUCKET}/deploy/src/engine/simulation_job.py" \
+        --cluster="${CLUSTER_NAME}" \
+        --region="${REGION}" \
+        --project="${PROJECT_ID}" \
+        --py-files="gs://${CONFIG_BUCKET}/deploy/src/engine/integrator.py" \
+        --properties="spark.driver.memory=4g,spark.executor.memory=4g,spark.driver.maxResultSize=2g,spark.sql.execution.arrow.pyspark.enabled=true,spark.driver.memoryOverhead=1024,spark.executor.memoryOverhead=1024" \
+        -- \
+        --output="${OUTPUT_PATH}"
+
+    echo "----------------------------------------------------"
+    echo "✅ Job submitted successfully!"
+}
+
+# --- Main ---
+sync_engine_code
+submit_pyspark_job

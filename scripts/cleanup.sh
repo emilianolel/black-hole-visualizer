@@ -1,40 +1,60 @@
 #!/bin/bash
-# scripts/cleanup.sh — Global Shutdown and Environment Cleanup.
+# cleanup.sh — Global Shutdown and Environment Decommissioning Utility.
+#
+# This script stops all active services, removes local build artifacts,
+# clears virtual environments, and optionally destroys cloud infrastructure.
+#
+# Usage: ./scripts/cleanup.sh
 
-# Move to project root
-cd "$(dirname "$0")/.." || exit
+set -euo pipefail
 
-echo "----------------------------------------------------"
-echo "🌌 Schwarzschild Project: Global Cleanup"
-echo "----------------------------------------------------"
+# --- Configuration & Constants ---
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# 1. Stop active services
-if [ -f "scripts/manage.sh" ]; then
-    ./scripts/manage.sh stop
-fi
+# Move to project root context
+cd "${PROJECT_ROOT}"
 
-# 2. Cleanup local build artifacts
-echo "🧹 Removing Python artifacts (__pycache__)..."
-find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null
+function perform_cleanup() {
+    echo "----------------------------------------------------"
+    echo "🌌 Schwarzschild Project: Global Cleanup"
+    echo "----------------------------------------------------"
 
-echo "🧹 Removing environment directories (venv, node_modules)..."
-rm -rf venv/
-rm -rf frontend/node_modules/
-rm -f scripts/*.log
-rm -f scripts/*.pid
+    # 1. Stop active services using the central manager
+    if [[ -x "scripts/manage.sh" ]]; then
+        echo "🛑 Requesting service shutdown..."
+        ./scripts/manage.sh stop
+    fi
 
-# 3. Optional: Infrastructure Destruction
-read -p "⚠️  Do you want to destroy GCP Infrastructure (Terraform)? [y/N] " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "🏗️  Decommissioning Cloud Resources..."
-    cd terraform/environments/dev || exit
-    terraform destroy -auto-approve
-    cd - > /dev/null
-else
-    echo "✅ Cloud Infrastructure PRESERVED."
-fi
+    # 2. Cleanup local build artifacts
+    echo "🧹 Removing Python artifacts (__pycache__)..."
+    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 
-echo "----------------------------------------------------"
-echo "✨ Cleanup Complete. Project is now in 'Cold Storage'."
-echo "----------------------------------------------------"
+    echo "🧹 Removing environment directories (venv, node_modules)..."
+    rm -rf venv/
+    rm -rf frontend/node_modules/
+    rm -f scripts/*.log
+    rm -f scripts/*.pid
+
+    # 3. Optional: Infrastructure Destruction
+    # Using /dev/tty to ensure read works even if the script is piped
+    local reply
+    read -p "⚠️  Do you want to destroy ALL GCP Infrastructure (Terraform)? [y/N] " -n 1 -r < /dev/tty
+    echo
+    if [[ "${REPLY:-}" =~ ^[Yy]$ ]]; then
+        echo "🏗️  Decommissioning Cloud Resources..."
+        (
+            cd terraform/environments/dev
+            terraform destroy -auto-approve
+        )
+    else
+        echo "✅ Cloud Infrastructure PRESERVED."
+    fi
+
+    echo "----------------------------------------------------"
+    echo "✨ Cleanup Complete. Project is now in 'Cold Storage'."
+    echo "----------------------------------------------------"
+}
+
+# --- Main ---
+perform_cleanup
