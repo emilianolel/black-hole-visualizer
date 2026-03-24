@@ -30,8 +30,10 @@ def derivatives(state: np.ndarray, lambda_prop: float) -> np.ndarray:
     """
     t, r, theta, phi, pt, pr, ptheta, pphi = state
     
-    # Pre-calculate common terms to avoid redundant division
-    one_minus_rs_r = 1.0 - RS / r
+    # Safety: Coordinate singularity at RS=2M. We use a safety buffer to prevent 
+    # division by zero or sign-flips during intermediate RK4 evaluations.
+    r_safe = max(r, RS + 1e-7)
+    one_minus_rs_r = 1.0 - RS / r_safe
     
     # Equations of motion (Hamiltonian formulation)
     # p_mu = g_mu_nu * dx^nu / d_lambda
