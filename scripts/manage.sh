@@ -61,7 +61,8 @@ function app_start() {
     # Start Backend
     if [[ ! -f "${API_PID_FILE}" ]]; then
         echo "🚀 Starting Backend API..."
-        export PYTHONPATH="${PROJECT_ROOT}:$PYTHONPATH"
+        # Safely expand PYTHONPATH even if it's currently unbound
+        export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH:-}"
         ./venv/bin/uvicorn src.api.main:app --host 0.0.0.0 --port 8000 > "${API_LOG}" 2>&1 &
         echo $! > "${API_PID_FILE}"
         echo "✅ Backend launched (Log: scripts/api.log)"
