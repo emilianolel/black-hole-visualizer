@@ -84,6 +84,6 @@ resource "google_compute_firewall" "iap_ssh" {
     ports    = ["22"]
   }
 
-  target_tags   = ["dataproc"]
+  target_tags   = ["dataproc", "ssh-server"]
   source_ranges = ["35.235.240.0/20"] # GCP IAP IP range
 }
